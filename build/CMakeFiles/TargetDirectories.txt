@@ -1,0 +1,3 @@
+/home/armaan025/Desktop/ARMAAN/Coding/projects/mythwood/build/CMakeFiles/mythwood.dir
+/home/armaan025/Desktop/ARMAAN/Coding/projects/mythwood/build/CMakeFiles/edit_cache.dir
+/home/armaan025/Desktop/ARMAAN/Coding/projects/mythwood/build/CMakeFiles/rebuild_cache.dir
