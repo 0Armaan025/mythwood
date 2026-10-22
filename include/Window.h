@@ -15,6 +15,7 @@ public:
   void clear();
   void present();
 
+  SDL_Renderer *getRenderer() const { return renderer; }
   bool isRunning() const;
 
 private:

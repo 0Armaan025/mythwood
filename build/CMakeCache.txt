@@ -207,6 +207,9 @@ Mythwood_SOURCE_DIR:STATIC=/home/armaan025/Desktop/ARMAAN/Coding/projects/mythwo
 //The directory containing a CMake configuration file for SDL2.
 SDL2_DIR:PATH=/usr/lib/cmake/SDL2
 
+//The directory containing a CMake configuration file for SDL2_ttf.
+SDL2_ttf_DIR:PATH=/usr/lib/cmake/SDL2_ttf
+
 
 ########################
 # INTERNAL cache entries

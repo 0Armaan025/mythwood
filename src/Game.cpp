@@ -1,14 +1,20 @@
+
 #include "../include/Game.h"
 
-bool Game::init() { return window.create("Mythwood", 960, 640); }
+bool Game::init() {
+  if (!window.create("Mythwood", 960, 640))
+    return false;
+
+  return mainMenu.init();
+}
 
 void Game::run() {
   while (window.isRunning()) {
     window.pollEvents();
 
-    window.clear();
+    if (!mainMenu.update())
+      break;
 
-    // my stuff
-    window.present();
+    mainMenu.render(window.getRenderer());
   }
 }

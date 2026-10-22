@@ -1,5 +1,6 @@
 #pragma once
 
+#include "./MainMenu.h"
 #include "./Window.h"
 
 class Game {
@@ -9,4 +10,5 @@ public:
 
 private:
   Window window;
+  MainMenu mainMenu;
 };
