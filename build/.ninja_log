@@ -1,3 +1,7 @@
 # ninja log v7
 0	536	1792695519151587707	CMakeFiles/mythwood.dir/src/main.cpp.o	644e04a629d15cc5
 536	577	1792695519688548464	mythwood	33ea7506ae9fd9c0
+3	387	1792696234530310852	CMakeFiles/mythwood.dir/src/Game.cpp.o	23ec93833145443
+2	388	1792696234529310832	CMakeFiles/mythwood.dir/src/main.cpp.o	3aed053865f86879
+3	501	1792696234531399353	CMakeFiles/mythwood.dir/src/Window.cpp.o	3eb4d053a35a69b4
+501	536	1792696235028351001	mythwood	9d93dc7ac23e671a
