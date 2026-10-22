@@ -58,7 +58,9 @@ bool MainMenu::update() {
       hoveredButton = i;
 
       if (mouseDown && !mouseWasDown) {
-        if (i == 3)
+        if (i == 0) {
+          newGameRequested = true;
+        } else if (i == 3)
           return false;
 
         // Other buttons will get functionality later.
@@ -126,4 +128,10 @@ void MainMenu::render(SDL_Renderer *renderer) {
   }
 
   SDL_RenderPresent(renderer);
+}
+
+bool MainMenu::takeNewGameRequest() {
+  bool requested = newGameRequested;
+  newGameRequested = false;
+  return requested;
 }

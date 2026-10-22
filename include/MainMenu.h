@@ -17,7 +17,11 @@ public:
 
   bool init();
   bool update();
+
   void render(SDL_Renderer *renderer); // reminds me of redis lol
+  //
+
+  bool takeNewGameRequest();
 
 private:
   TTF_Font *titleFont = nullptr;
@@ -46,6 +50,8 @@ private:
 
   // not really convenient but works for now ig, coz it's not a big game like i
   // thought id' make
+
+  bool newGameRequested = false;
 };
 
 // ARE ALL OF US RIDING TO OUR DEATHS!? YES, WE ARE!!! MY SOLIDERS SCREAM, MY
