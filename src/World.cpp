@@ -1,6 +1,8 @@
 #include "../include/World.h"
 #include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_render.h>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 World::~World() {
@@ -201,6 +203,43 @@ void World::render(SDL_Renderer *renderer) const {
     structure.render(renderer);
 
   player.render(renderer);
+
+  // HAND AND TIP(GUN)
+
+  if (magicEquipped) {
+    int mouseX = 0;
+    int mouseY = 0;
+    SDL_GetMouseState(&mouseX, &mouseY);
+
+    const SDL_Rect bounds = player.getBounds();
+
+    const float cx = bounds.x + bounds.w / 2.0f;
+    const float cy = bounds.y + bounds.h / 2.0f;
+
+    const float angle = std::atan2(mouseY - cy, mouseX - cx);
+
+    const float handOffset = 8.0f;
+    const float tipOffset = 20.0f;
+
+    const float handX = cx + std::cos(angle) * handOffset;
+    const float handY = cy + std::sin(angle) * handOffset;
+
+    const float tipX = cx + std::cos(angle) * tipOffset;
+    const float tipY = cy + std::sin(angle) * tipOffset;
+
+    SDL_SetRenderDrawColor(renderer, 95, 55, 35, 255);
+
+    SDL_RenderDrawLine(renderer, static_cast<int>(handX),
+                       static_cast<int>(handY), static_cast<int>(tipX),
+                       static_cast<int>(tipY));
+    SDL_SetRenderDrawColor(renderer, 175, 115, 255, 255);
+
+    // jin woo lol
+    SDL_Rect crystal = {static_cast<int>(tipX) - 3, static_cast<int>(tipY) - 3,
+                        7, 7};
+
+    SDL_RenderFillRect(renderer, &crystal);
+  }
 
   for (const auto &projectile : projectiles) {
     projectile.render(renderer);
