@@ -17,6 +17,7 @@ add_executable(mythwood
   src/Player.cpp
   src/Inventory.cpp
   src/Structure.cpp
+  src/Projectile.cpp
 )
 
 target_include_directories(mythwood PRIVATE include)
