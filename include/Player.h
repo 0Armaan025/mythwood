@@ -1,10 +1,15 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include <iostream>
+#include <vector>
+using namespace std;
 
 class Player {
 public:
-  void update(
-      float deltaTime); // OH THIS BRINGS BACK NOSTALGIA FROM WHEN I USED UNITY
+  void
+  update(float deltaTime,
+         const vector<SDL_Rect> &
+             obstacles); // OH THIS BRINGS BACK NOSTALGIA FROM WHEN I USED UNITY
   void render(SDL_Renderer *renderer) const;
   void reset();
 

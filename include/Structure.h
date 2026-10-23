@@ -20,6 +20,8 @@ public:
 
   bool isUsed() const;
 
+  SDL_Rect getBounds() const;
+
 private:
   StructureType type;
   SDL_Rect bounds;

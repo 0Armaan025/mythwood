@@ -2,12 +2,13 @@
 
 #include "../include/Player.h"
 #include <algorithm>
+#include <iostream>
 
 SDL_Rect Player::getBounds() const {
   return {static_cast<int>(x), static_cast<int>(y), 24, 32};
 }
 
-void Player::update(float deltaTime) {
+void Player::update(float deltaTime, const std::vector<SDL_Rect> &obstacles) {
   const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
   float dx = 0.0f;
@@ -22,16 +23,46 @@ void Player::update(float deltaTime) {
   if (keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT])
     dx += 1;
 
+  // for diagonal stuff ig
   if (dx != 0 && dy != 0) {
     dx *= 0.70710678f;
     dy *= 0.70710678f;
   }
 
-  x += dx * speed * deltaTime;
-  y += dy * speed * deltaTime;
+  const float moveX = dx * speed * deltaTime;
+  const float moveY = dy * speed * deltaTime;
 
-  x = std::clamp(x, 0.0f, 936.0f);
-  y = std::clamp(y, 76.0f, 600.0f);
+  x = std::clamp(x + moveX, 0.0f, 936.0f);
+
+  SDL_Rect candidate = getBounds();
+  bool blocked = false;
+
+  for (const SDL_Rect &obstacle : obstacles) {
+    if (SDL_HasIntersection(&candidate, &obstacle)) {
+      cout << "collision" << endl;
+      blocked = true;
+      break;
+    }
+  }
+
+  if (blocked) {
+    x = x - moveX;
+  }
+
+  // vertical wall slide
+
+  y = std::clamp(y + moveY, 76.0f, 600.0f);
+  candidate = getBounds();
+  blocked = false;
+  for (const SDL_Rect &obstacle : obstacles) {
+    if (SDL_HasIntersection(&candidate, &obstacle)) {
+      blocked = true;
+      break;
+    }
+  }
+
+  if (blocked)
+    y -= moveY;
 }
 
 void Player::render(SDL_Renderer *renderer) const {

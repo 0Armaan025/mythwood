@@ -78,13 +78,19 @@ void World::update(float deltaTime) {
       message = "Nothing nearby to interact with.";
   }
 
-  cout << "Message: " << message << endl;
-
   previousE = eDown;
   previousI = iDown;
 
-  if (!inventoryOpen)
-    player.update(deltaTime);
+  if (!inventoryOpen) {
+    std::vector<SDL_Rect> obstacles;
+    obstacles.reserve(structures.size());
+
+    for (const auto &structure : structures) {
+      obstacles.push_back(structure.getBounds());
+    }
+
+    player.update(deltaTime, obstacles);
+  }
 }
 
 void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
@@ -138,7 +144,6 @@ void World::render(SDL_Renderer *renderer) const {
   SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
   SDL_RenderDrawLine(renderer, 0, 63, 960, 63);
 
-  std::cout << "Rendering message: " << message << std::endl;
   drawText(renderer, "MYTHWOOD", 24, 17, {220, 204, 158, 255});
 
   drawText(renderer, "E: Interact   I: Inventory", 650, 22,

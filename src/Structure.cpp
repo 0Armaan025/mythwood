@@ -57,6 +57,8 @@ void Structure::render(SDL_Renderer *renderer) const {
   }
 }
 
+SDL_Rect Structure::getBounds() const { return bounds; }
+
 bool Structure::isNear(SDL_Rect playerBounds) const {
   SDL_Rect range{bounds.x - 50, bounds.y - 50, bounds.w + 100, bounds.h + 100};
 

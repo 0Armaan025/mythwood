@@ -20,6 +20,7 @@ void Game::run() {
   while (window.isRunning()) {
     Uint64 current = SDL_GetPerformanceCounter();
 
+    // tired
     float deltaTime =
         static_cast<float>(static_cast<double>(current - previous) /
                            SDL_GetPerformanceFrequency());
