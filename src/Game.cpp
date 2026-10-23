@@ -6,9 +6,6 @@ bool Game::init() {
   if (!window.create("Mythwood", 960, 640))
     return false;
 
-  if (!mainMenu.init()) {
-    return false;
-  }
   return mainMenu.init();
 }
 
@@ -31,12 +28,12 @@ void Game::run() {
       if (!mainMenu.update())
         break;
 
-      if (mainMenu.takeNewGameRequest())
+      if (mainMenu.takeNewGameRequest()) {
         world.start();
-      playing = true;
+        playing = true;
+      }
 
-      if (!playing)
-        mainMenu.render(window.getRenderer());
+      mainMenu.render(window.getRenderer());
     } else {
       world.update(deltaTime);
 
