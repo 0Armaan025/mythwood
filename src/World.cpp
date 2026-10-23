@@ -1,24 +1,42 @@
 #include "../include/World.h"
-#include <SDL2/SDL_keyboard.h>
 #include <iostream>
-using namespace std;
 
 World::~World() {
-  if (font) {
+  if (font)
     TTF_CloseFont(font);
-  }
 }
 
 bool World::init() {
-  font = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSerif.ttf", 20);
+  font = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSerif.ttf", 18);
 
   if (!font) {
-    cout << "ttf error: " << TTF_GetError() << endl;
+    cout << "error: " << TTF_GetError() << endl;
     return false;
   }
 
-  returnToMenu = false;
+  start();
   return true;
+}
+
+void World::start() {
+  player.reset();
+  inventory = Inventory{};
+  structures.clear();
+
+  structures.emplace_back(StructureType::Chest, SDL_Rect{390, 270, 34, 28},
+                          "Old Chest");
+
+  structures.emplace_back(StructureType::AncientShrine,
+                          SDL_Rect{650, 180, 48, 52}, "Ancient Shrine");
+
+  structures.emplace_back(StructureType::Cabin, SDL_Rect{140, 160, 100, 80},
+                          "Forest Cabin");
+
+  inventoryOpen = false;
+  returnToMenu = false;
+  previousE = false;
+  previousI = false;
+  message = "Explore the forest.";
 }
 
 void World::update(float deltaTime) {
@@ -29,18 +47,66 @@ void World::update(float deltaTime) {
     return;
   }
 
-  player.update(deltaTime);
+  const bool eDown = keys[SDL_SCANCODE_E];
+  const bool iDown = keys[SDL_SCANCODE_I];
+
+  if (iDown && !previousI)
+    inventoryOpen = !inventoryOpen;
+
+  if (eDown && !previousE) {
+    bool found = false;
+
+    for (auto &structure : structures) {
+      if (!structure.isNear(player.getBounds()))
+        continue;
+
+      found = true;
+
+      if (structure.interact(inventory)) {
+        message = "Found something at " + structure.getName() + "!";
+      } else if (structure.isUsed()) {
+        message = structure.getName() + " has already been explored.";
+      } else {
+        message = structure.getName() + " cannot be opened yet.";
+      }
+
+      break;
+    }
+
+    if (!found)
+      message = "Nothing nearby to interact with.";
+  }
+
+  previousE = eDown;
+  previousI = iDown;
+
+  if (!inventoryOpen)
+    player.update(deltaTime);
 }
 
-// forest time heheehehehehe
+void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
+                     SDL_Color color) const {
+  SDL_Surface *surface = TTF_RenderUTF8_Blended(font, text.c_str(), color);
+
+  if (!surface)
+    return;
+
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+  if (texture) {
+    SDL_Rect dest{x, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, nullptr, &dest);
+    SDL_DestroyTexture(texture);
+  }
+
+  SDL_FreeSurface(surface);
+}
 
 void World::render(SDL_Renderer *renderer) const {
-  // ground and grasses
   SDL_SetRenderDrawColor(renderer, 35, 55, 39, 255);
-  SDL_Rect ground{0, 64, 960, 576};
-  SDL_RenderFillRect(renderer, &ground);
+  SDL_RenderClear(renderer);
 
-  // Simple grass patches
+  // Grass patches
   SDL_SetRenderDrawColor(renderer, 42, 65, 44, 255);
 
   for (int i = 0; i < 30; ++i) {
@@ -48,8 +114,13 @@ void World::render(SDL_Renderer *renderer) const {
     SDL_RenderFillRect(renderer, &patch);
   }
 
-  // tiles/HUD
+  // Structures behind the player
+  for (const auto &structure : structures)
+    structure.render(renderer);
 
+  player.render(renderer);
+
+  // Top HUD
   SDL_SetRenderDrawColor(renderer, 20, 29, 25, 255);
   SDL_Rect bar{0, 0, 960, 64};
   SDL_RenderFillRect(renderer, &bar);
@@ -57,28 +128,45 @@ void World::render(SDL_Renderer *renderer) const {
   SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
   SDL_RenderDrawLine(renderer, 0, 63, 960, 63);
 
-  SDL_Surface *surface =
-      TTF_RenderUTF8_Blended(font, "MYTHWOOD", {220, 204, 158, 255});
+  drawText(renderer, "MYTHWOOD", 24, 17, {220, 204, 158, 255});
 
-  if (surface) {
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+  drawText(renderer, "E: Interact   I: Inventory", 650, 22,
+           {160, 174, 142, 255});
 
-    if (texture) {
-      SDL_Rect dest{24, 17, surface->w, surface->h};
-      SDL_RenderCopy(renderer, texture, nullptr, &dest);
-      SDL_DestroyTexture(texture);
+  // Interaction feedback
+  SDL_SetRenderDrawColor(renderer, 20, 29, 25, 230);
+  SDL_Rect messagePanel{20, 570, 500, 48};
+  SDL_RenderFillRect(renderer, &messagePanel);
+
+  drawText(renderer, message, 32, 584, {220, 204, 158, 255});
+
+  // Inventory panel
+  if (inventoryOpen) {
+    SDL_SetRenderDrawColor(renderer, 20, 29, 25, 245);
+    SDL_Rect panel{610, 90, 320, 450};
+    SDL_RenderFillRect(renderer, &panel);
+
+    SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
+    SDL_RenderDrawRect(renderer, &panel);
+
+    drawText(renderer, "INVENTORY", 635, 110, {220, 204, 158, 255});
+
+    int y = 150;
+
+    for (const auto &item : inventory.getItems()) {
+      drawText(renderer, item.name + " x" + to_string(item.quantity), 635, y,
+               {190, 199, 170, 255});
+
+      y += 30;
     }
 
-    SDL_FreeSurface(surface);
-  }
+    if (inventory.getItems().empty())
+      drawText(renderer, "Your bag is empty.", 635, 155, {160, 174, 142, 255});
 
-  player.render(renderer);
+    drawText(renderer, "Press I to close", 635, 500, {160, 174, 142, 255});
+  }
 
   SDL_RenderPresent(renderer);
 }
 
 bool World::shouldReturnToMenu() const { return returnToMenu; }
-void World::start() {
-  player.reset();
-  returnToMenu = false;
-}

@@ -1,8 +1,16 @@
 # ninja log v7
-0	505	1792698681790077089	CMakeFiles/mythwood.dir/src/main.cpp.o	3aed053865f86879
-562	594	1792698682352078487	mythwood	9b55d95438d7e353
-1	502	1792698681791077092	CMakeFiles/mythwood.dir/src/Game.cpp.o	23ec93833145443
+1	493	1792698821720742599	CMakeFiles/mythwood.dir/src/main.cpp.o	3aed053865f86879
+536	572	1792698822255746261	mythwood	9b55d95438d7e353
+1	496	1792698821722022648	CMakeFiles/mythwood.dir/src/Game.cpp.o	23ec93833145443
 3	549	1792697506827885117	CMakeFiles/mythwood.dir/src/Window.cpp.o	3eb4d053a35a69b4
 1	562	1792698681791904685	CMakeFiles/mythwood.dir/src/MainMenu.cpp.o	5ee30b8a2a09080c
-1	453	1792698681792214594	CMakeFiles/mythwood.dir/src/Player.cpp.o	8cb50bccbe1b2be9
-1	540	1792698681792084760	CMakeFiles/mythwood.dir/src/World.cpp.o	dce42effb18519d9
+1	444	1792698821722375724	CMakeFiles/mythwood.dir/src/Player.cpp.o	8cb50bccbe1b2be9
+1	536	1792698821722237579	CMakeFiles/mythwood.dir/src/World.cpp.o	dce42effb18519d9
+4	306	1792780044977204503	CMakeFiles/mythwood.dir/src/Inventory.cpp.o	89277b04f5e936e1
+4	467	1792780044976889007	CMakeFiles/mythwood.dir/src/Player.cpp.o	8cb50bccbe1b2be9
+3	585	1792780044974973620	CMakeFiles/mythwood.dir/src/main.cpp.o	3aed053865f86879
+3	601	1792780044976102710	CMakeFiles/mythwood.dir/src/Game.cpp.o	23ec93833145443
+4	642	1792780044976535543	CMakeFiles/mythwood.dir/src/World.cpp.o	dce42effb18519d9
+3	588	1792780333464335783	CMakeFiles/mythwood.dir/src/Structure.cpp.o	e4fb897473e35117
+1	261	1792780412496766450	CMakeFiles/mythwood.dir/src/Inventory.cpp.o	89277b04f5e936e1
+261	294	1792780412756767908	mythwood	c182bf15a7b9cd10

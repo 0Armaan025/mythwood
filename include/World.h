@@ -4,6 +4,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include <string>
+#include <vector>
+
+#include "../include/Inventory.h"
+#include "../include/Structure.h"
 class World {
 public:
   ~World(); // ewww
@@ -16,6 +21,18 @@ public:
 
 private:
   Player player;
+  Inventory inventory;
+  std::vector<Structure> structures;
+
   TTF_Font *font = nullptr;
+
   bool returnToMenu = false;
+  bool inventoryOpen = false;
+  bool previousE = false;
+  bool previousI = false;
+
+  string message = "Explore the forest.";
+
+  void drawText(SDL_Renderer *renderer, const std::string &text, int x, int y,
+                SDL_Color color) const;
 };
