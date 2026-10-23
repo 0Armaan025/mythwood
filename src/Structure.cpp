@@ -71,6 +71,11 @@ bool Structure::interact(Inventory &inventory) {
 
   switch (type) {
   case StructureType::Chest: {
+
+    if (!inventory.addItem({"moonfire_sigil", "Moonfire Sigil [P]", 1, 1})) {
+      return false;
+    }
+
     if (!inventory.addItem({"moonleaf", "Moonleaf", 3, 20})) {
       return false;
     }

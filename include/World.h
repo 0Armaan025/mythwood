@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../include/Inventory.h"
+#include "../include/Projectile.h"
 #include "../include/Structure.h"
 class World {
 public:
@@ -37,4 +38,12 @@ private:
 
   void drawText(SDL_Renderer *renderer, const std::string &text, int x, int y,
                 SDL_Color color) const;
+
+  std::vector<Projectile> projectiles;
+
+  bool previousP = false;
+  bool magicEquipped = false;
+
+  float shotCoolDown = 0.0f;
+  static constexpr float SHOT_INTERVAL = 0.25f;
 };

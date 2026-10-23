@@ -1,4 +1,6 @@
 #include "../include/World.h"
+#include <SDL2/SDL_mouse.h>
+#include <algorithm>
 #include <iostream>
 
 World::~World() {
@@ -20,6 +22,10 @@ bool World::init() {
 
 void World::start() {
   player.reset();
+  projectiles.clear();
+  magicEquipped = false;
+  previousP = false;
+  shotCoolDown = 0.0f;
   inventory = Inventory{};
   structures.clear();
 
@@ -49,9 +55,26 @@ void World::update(float deltaTime) {
 
   const bool eDown = keys[SDL_SCANCODE_E];
   const bool iDown = keys[SDL_SCANCODE_I];
+  const bool pDown = keys[SDL_SCANCODE_P];
 
   if (iDown && !previousI)
     inventoryOpen = !inventoryOpen;
+
+  // OUR GUN STUFF
+
+  if (pDown && !previousP) {
+    if (magicEquipped) {
+      magicEquipped = false;
+      message = "Moonfire Sigil unequipped";
+    } else if (inventory.countItem("moonfire_sigil") > 0) {
+      magicEquipped = true;
+      message = "Moonfire Sigil equipped! Left-click to cast.";
+    } else {
+      message = "you need to discover the Moonfire Sigil first.";
+    }
+  }
+
+  previousP = pDown;
 
   if (!inventoryOpen) {
     for (auto &structure : structures) {
@@ -104,6 +127,36 @@ void World::update(float deltaTime) {
 
     player.update(deltaTime, obstacles);
   }
+
+  shotCoolDown = shotCoolDown - deltaTime;
+
+  for (auto &projectile : projectiles) {
+
+    projectile.update(deltaTime);
+  }
+
+  int mouseX = 0;
+  int mouseY = 0;
+  const Uint32 mouseButtons = SDL_GetMouseState(&mouseX, &mouseY);
+
+  if (!inventoryOpen && magicEquipped && (mouseButtons & SDL_BUTTON_LMASK) &&
+      shotCoolDown <= 0.0f) {
+
+    const SDL_Rect playerBounds = player.getBounds();
+    const float startX = playerBounds.x + playerBounds.w / 2.0f;
+    const float startY = playerBounds.y + playerBounds.h / 2.0f;
+
+    projectiles.emplace_back(startX, startY, static_cast<float>(mouseX),
+                             static_cast<float>(mouseY));
+
+    shotCoolDown = SHOT_INTERVAL;
+  }
+
+  projectiles.erase(std::remove_if(projectiles.begin(), projectiles.end(),
+                                   [](const Projectile &projectile) {
+                                     return !projectile.isAlive();
+                                   }),
+                    projectiles.end());
 }
 
 void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
@@ -149,6 +202,10 @@ void World::render(SDL_Renderer *renderer) const {
 
   player.render(renderer);
 
+  for (const auto &projectile : projectiles) {
+    projectile.render(renderer);
+  }
+
   // Top HUD
   SDL_SetRenderDrawColor(renderer, 20, 29, 25, 255);
   SDL_Rect bar{0, 0, 960, 64};
@@ -158,15 +215,16 @@ void World::render(SDL_Renderer *renderer) const {
   SDL_RenderDrawLine(renderer, 0, 63, 960, 63);
 
   drawText(renderer, "MYTHWOOD", 24, 17, {220, 204, 158, 255});
-
-  drawText(renderer, "E: Interact   I: Inventory", 650, 22,
-           {160, 174, 142, 255});
-
   // Interaction feedback
   SDL_SetRenderDrawColor(renderer, 20, 29, 25, 230);
   SDL_Rect messagePanel{20, 570, 500, 48};
   SDL_RenderFillRect(renderer, &messagePanel);
 
+  drawText(renderer, "E: Interact   I: Inventory   P: Equip Sigil", 440, 22,
+           {160, 174, 142, 255});
+  drawText(renderer,
+           magicEquipped ? "Moonfire: EQUIPPED" : "Moonfire: Unequipped", 24,
+           42, {190, 199, 170, 255});
   if (nearbyStructure) {
     const std::string prompt = "E - Interact: " + nearbyStructure->getName();
 
