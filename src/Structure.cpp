@@ -58,18 +58,9 @@ void Structure::render(SDL_Renderer *renderer) const {
 }
 
 bool Structure::isNear(SDL_Rect playerBounds) const {
-  const int px = playerBounds.x + playerBounds.w / 2;
-  const int py = playerBounds.y + playerBounds.h / 2;
+  SDL_Rect range{bounds.x - 50, bounds.y - 50, bounds.w + 100, bounds.h + 100};
 
-  const int sx = bounds.x + bounds.w / 2;
-  const int sy = bounds.y + bounds.h / 2;
-
-  const int dx = px - sx;
-  const int dy = py - sy;
-
-  constexpr int INTERACTION_RADIUS = 60;
-
-  return dx * dx + dy * dy <= INTERACTION_RADIUS * INTERACTION_RADIUS;
+  return SDL_HasIntersection(&playerBounds, &range);
 }
 
 bool Structure::interact(Inventory &inventory) {

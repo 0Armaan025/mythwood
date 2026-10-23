@@ -6,7 +6,13 @@ bool Game::init() {
   if (!window.create("Mythwood", 960, 640))
     return false;
 
-  return mainMenu.init();
+  if (!mainMenu.init())
+    return false;
+
+  if (!world.init())
+    return false;
+
+  return true;
 }
 
 void Game::run() {

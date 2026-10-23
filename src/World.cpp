@@ -54,6 +54,7 @@ void World::update(float deltaTime) {
     inventoryOpen = !inventoryOpen;
 
   if (eDown && !previousE) {
+    std::cout << "E pressed in World::update()" << endl;
     bool found = false;
 
     for (auto &structure : structures) {
@@ -77,6 +78,8 @@ void World::update(float deltaTime) {
       message = "Nothing nearby to interact with.";
   }
 
+  cout << "Message: " << message << endl;
+
   previousE = eDown;
   previousI = iDown;
 
@@ -88,17 +91,24 @@ void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
                      SDL_Color color) const {
   SDL_Surface *surface = TTF_RenderUTF8_Blended(font, text.c_str(), color);
 
-  if (!surface)
+  if (!surface) {
+    std::cerr << "TTF_RenderUTF8_Blended failed: " << TTF_GetError()
+              << std::endl;
     return;
-
+  }
   SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-  if (texture) {
+  if (!texture) {
+    std::cerr << "SDL_CreateTextureFromSurface failed: " << SDL_GetError()
+              << std::endl;
+  } else {
     SDL_Rect dest{x, y, surface->w, surface->h};
-    SDL_RenderCopy(renderer, texture, nullptr, &dest);
+
+    if (SDL_RenderCopy(renderer, texture, nullptr, &dest) != 0)
+      std::cerr << "SDL_RenderCopy failed: " << SDL_GetError() << std::endl;
+
     SDL_DestroyTexture(texture);
   }
-
   SDL_FreeSurface(surface);
 }
 
@@ -128,6 +138,7 @@ void World::render(SDL_Renderer *renderer) const {
   SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
   SDL_RenderDrawLine(renderer, 0, 63, 960, 63);
 
+  std::cout << "Rendering message: " << message << std::endl;
   drawText(renderer, "MYTHWOOD", 24, 17, {220, 204, 158, 255});
 
   drawText(renderer, "E: Interact   I: Inventory", 650, 22,
