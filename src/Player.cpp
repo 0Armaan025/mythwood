@@ -39,7 +39,6 @@ void Player::update(float deltaTime, const std::vector<SDL_Rect> &obstacles) {
 
   for (const SDL_Rect &obstacle : obstacles) {
     if (SDL_HasIntersection(&candidate, &obstacle)) {
-      cout << "collision" << endl;
       blocked = true;
       break;
     }

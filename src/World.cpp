@@ -53,29 +53,42 @@ void World::update(float deltaTime) {
   if (iDown && !previousI)
     inventoryOpen = !inventoryOpen;
 
+  if (!inventoryOpen) {
+    for (auto &structure : structures) {
+      if (structure.isNear(player.getBounds())) {
+        nearbyStructure = &structure;
+        break;
+      }
+    }
+  }
+
   if (eDown && !previousE) {
-    std::cout << "E pressed in World::update()" << endl;
-    bool found = false;
+
+    nearbyStructure = nullptr;
 
     for (auto &structure : structures) {
-      if (!structure.isNear(player.getBounds()))
-        continue;
-
-      found = true;
-
-      if (structure.interact(inventory)) {
-        message = "Found something at " + structure.getName() + "!";
-      } else if (structure.isUsed()) {
-        message = structure.getName() + " has already been explored.";
-      } else {
-        message = structure.getName() + " cannot be opened yet.";
+      if (structure.isNear(player.getBounds())) {
+        nearbyStructure = &structure;
+        break;
       }
-
-      break;
     }
 
-    if (!found)
-      message = "Nothing nearby to interact with.";
+    if (eDown && !previousE) {
+      if (nearbyStructure) {
+        if (nearbyStructure->interact(inventory)) {
+          message = "Found something at " + nearbyStructure->getName() + "!";
+        } else if (nearbyStructure->isUsed()) {
+
+          message = nearbyStructure->getName() + " has already been explored.";
+        } else if (nearbyStructure->getBounds().w > 0) {
+          message = nearbyStructure->getName() + " cannot be opened yet.";
+        }
+      }
+
+      else {
+        message = "Nothing nearby to interact with.";
+      }
+    }
   }
 
   previousE = eDown;
@@ -154,8 +167,13 @@ void World::render(SDL_Renderer *renderer) const {
   SDL_Rect messagePanel{20, 570, 500, 48};
   SDL_RenderFillRect(renderer, &messagePanel);
 
-  drawText(renderer, message, 32, 584, {220, 204, 158, 255});
+  if (nearbyStructure) {
+    const std::string prompt = "E - Interact: " + nearbyStructure->getName();
 
+    drawText(renderer, prompt, 32, 550, {190, 199, 170, 255});
+  }
+
+  drawText(renderer, message, 32, 584, {220, 204, 158, 255});
   // Inventory panel
   if (inventoryOpen) {
     SDL_SetRenderDrawColor(renderer, 20, 29, 25, 245);

@@ -31,6 +31,8 @@ private:
   bool previousE = false;
   bool previousI = false;
 
+  Structure *nearbyStructure = nullptr;
+
   string message = "Explore the forest.";
 
   void drawText(SDL_Renderer *renderer, const std::string &text, int x, int y,
