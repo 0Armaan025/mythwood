@@ -23,6 +23,8 @@ bool World::init() {
 }
 
 void World::start() {
+  enemies.clear();
+  enemies.emplace_back(500.0f, 420.0f);
   player.reset();
   projectiles.clear();
   magicEquipped = false;
@@ -132,9 +134,43 @@ void World::update(float deltaTime) {
 
   shotCoolDown = shotCoolDown - deltaTime;
 
+  for (auto &enemy : enemies) {
+    enemy.update(deltaTime);
+  }
+
   for (auto &projectile : projectiles) {
 
     projectile.update(deltaTime);
+  }
+
+  for (auto &projectile : projectiles) {
+    if (!projectile.isAlive())
+      continue;
+
+    const SDL_Rect projectileBounds = projectile.getBounds();
+
+    for (auto &enemy : enemies) {
+      if (!enemy.isAlive())
+        continue;
+
+      const SDL_Rect enemyBounds = enemy.getBounds();
+
+      if (SDL_HasIntersection(&projectileBounds, &enemyBounds)) {
+        enemy.takeDamage(10);
+        projectile.destroy();
+        break;
+      }
+    }
+
+    for (const auto &structure : structures) {
+      const SDL_Rect structureBounds = structure.getBounds();
+
+      if (SDL_HasIntersection(&projectileBounds, &structureBounds)) {
+        projectile.destroy();
+
+        break;
+      }
+    }
   }
 
   int mouseX = 0;
@@ -243,6 +279,10 @@ void World::render(SDL_Renderer *renderer) const {
 
   for (const auto &projectile : projectiles) {
     projectile.render(renderer);
+  }
+
+  for (const auto &enemy : enemies) {
+    enemy.render(renderer);
   }
 
   // Top HUD

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "../include/Enemy.h"
 #include "../include/Inventory.h"
 #include "../include/Projectile.h"
 #include "../include/Structure.h"
@@ -26,6 +27,7 @@ private:
   std::vector<Structure> structures;
 
   TTF_Font *font = nullptr;
+  std::vector<Enemy> enemies;
 
   bool returnToMenu = false;
   bool inventoryOpen = false;

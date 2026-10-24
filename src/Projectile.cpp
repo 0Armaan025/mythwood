@@ -73,3 +73,5 @@ SDL_Rect Projectile::getBounds() const {
   return {static_cast<int>(x) - radius, static_cast<int>(y) - radius,
           radius * 2, radius * 2};
 }
+
+void Projectile::destroy() { alive = false; }

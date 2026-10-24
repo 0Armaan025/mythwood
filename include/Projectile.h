@@ -10,6 +10,7 @@ public:
 
   bool isAlive() const;
   SDL_Rect getBounds() const;
+  void destroy();
 
 private:
   float x;
