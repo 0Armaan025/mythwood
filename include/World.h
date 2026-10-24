@@ -11,13 +11,25 @@
 #include "../include/Inventory.h"
 #include "../include/Projectile.h"
 #include "../include/Structure.h"
+#include <cstdint>
+#include <unordered_set>
+
+struct ResourceNode {
+  enum class Type { Tree, Rock };
+
+  int tileX;
+  int tileY;
+  Type type;
+  SDL_Rect bounds;
+};
+
 class World {
 public:
   ~World(); // ewww
 
   bool init();
   void start();
-  void update(float deltaTime);
+  void update(float deltaTime, SDL_Renderer *renderer);
   void render(SDL_Renderer *renderer) const;
   bool shouldReturnToMenu() const; // yay at least this has been done :P
 
@@ -48,6 +60,11 @@ private:
 
   float shotCoolDown = 0.0f;
   static constexpr float SHOT_INTERVAL = 0.25f;
+
+  std::vector<ResourceNode> resourceNodes;
+  std::unordered_set<std::uint64_t> harvestedResourceKeys;
+
+  ResourceNode *nearbyResource = nullptr;
 
   // CHUNK STUFFY
 

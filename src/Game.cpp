@@ -42,7 +42,7 @@ void Game::run() {
 
       mainMenu.render(window.getRenderer());
     } else {
-      world.update(deltaTime);
+      world.update(deltaTime, window.getRenderer());
 
       if (world.shouldReturnToMenu()) {
         playing = false;

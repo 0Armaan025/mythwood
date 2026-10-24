@@ -18,6 +18,12 @@ std::uint32_t terrainHash(int x, int y) {
   h = (h ^ (h >> 13)) * 1274126177u;
   return h ^ (h >> 16);
 }
+
+std::uint64_t resourcekey(int x, int y) {
+  return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(x)) << 32) |
+         static_cast<std::uint32_t>(y);
+}
+
 } // namespace
 
 World::~World() {
@@ -64,7 +70,7 @@ void World::start() {
   message = "Explore the forest.";
 }
 
-void World::update(float deltaTime) {
+void World::update(float deltaTime, SDL_Renderer *renderer) {
   const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
   if (keys[SDL_SCANCODE_ESCAPE]) {
@@ -95,6 +101,43 @@ void World::update(float deltaTime) {
 
   previousP = pDown;
 
+  resourceNodes.clear();
+  nearbyResource = nullptr;
+
+  const int firstResourceTileX =
+      static_cast<int>(std::floor(cameraX / TILE_SIZE)) - 2;
+
+  const int firstResourceTileY =
+      static_cast<int>(std::floor(cameraY / TILE_SIZE)) - 2;
+  const int lastResourceTileX =
+      static_cast<int>(std::floor((cameraX + 960.0f) / TILE_SIZE)) + 2;
+  const int lastResourceTileY =
+      static_cast<int>(std::floor((cameraY + 640.0f) / TILE_SIZE)) + 2;
+
+  for (int ty = firstResourceTileY; ty <= lastResourceTileY; ++ty) {
+    for (int tx = firstResourceTileX; tx <= lastResourceTileX; ++tx) {
+      const std::uint32_t hash = terrainHash(tx, ty);
+
+      ResourceNode::Type type;
+      SDL_Rect bounds{};
+
+      if (hash % 83 == 0) {
+        type = ResourceNode::Type::Rock;
+        bounds = {tx * TILE_SIZE + 9, ty * TILE_SIZE + 10, 15, 12};
+
+      } else if (hash % 61 == 0) {
+        type = ResourceNode::Type::Tree;
+        bounds = {tx * TILE_SIZE + 6, ty * TILE_SIZE + 3, 20, 25};
+      } else {
+        continue;
+      }
+      if (harvestedResourceKeys.count(resourcekey(tx, ty)) != 0)
+        continue;
+
+      resourceNodes.push_back({tx, ty, type, bounds});
+    }
+  }
+
   if (!inventoryOpen) {
     for (auto &structure : structures) {
       if (structure.isNear(player.getBounds())) {
@@ -104,10 +147,42 @@ void World::update(float deltaTime) {
     }
   }
 
-  if (eDown && !previousE) {
+  // if (eDown && !previousE) {
+  //
+  //   nearbyStructure = nullptr;
+  //
+  //   for (auto &structure : structures) {
+  //     if (structure.isNear(player.getBounds())) {
+  //       nearbyStructure = &structure;
+  //       break;
+  //     }
+  //   }
+  //
+  //   if (eDown && !previousE) {
+  //   if (nearbyStructure) {
+  //     if (nearbyStructure->interact(inventory)) {
+  //       message = "Found something at " + nearbyStructure->getName() + "!";
+  //     } else if (nearbyStructure->isUsed()) {
+  //
+  //       message = nearbyStructure->getName() + " has already been
+  //                                              explored.";
+  //     } else if (nearbyStructure->getBounds().w > 0) {
+  //       message = nearbyStructure->getName() + " cannot be opened yet.";
+  //     }
+  //   }
+  //
+  //   else {
+  //     message = "Nothing nearby to interact with.";
+  //   }
+  // }
+  // }
+  //
+  //
 
-    nearbyStructure = nullptr;
+  nearbyStructure = nullptr;
+  nearbyResource = nullptr;
 
+  if (!inventoryOpen) {
     for (auto &structure : structures) {
       if (structure.isNear(player.getBounds())) {
         nearbyStructure = &structure;
@@ -115,19 +190,59 @@ void World::update(float deltaTime) {
       }
     }
 
-    if (eDown && !previousE) {
+    if (!nearbyStructure) {
+      for (auto &node : resourceNodes) {
+        if (harvestedResourceKeys.count(resourcekey(node.tileX, node.tileY)) !=
+            0)
+          continue;
+
+        SDL_Rect range{node.bounds.x - 50, node.bounds.y - 50,
+                       node.bounds.w + 100, node.bounds.h + 100};
+
+        const SDL_Rect playerBounds = player.getBounds();
+        if (SDL_HasIntersection(&playerBounds, &range)) {
+          nearbyResource = &node;
+          break;
+        }
+      }
+    }
+
+    if (eDown && !previousE && !inventoryOpen) {
       if (nearbyStructure) {
         if (nearbyStructure->interact(inventory)) {
           message = "Found something at " + nearbyStructure->getName() + "!";
         } else if (nearbyStructure->isUsed()) {
 
-          message = nearbyStructure->getName() + " has already been explored.";
+          message = nearbyStructure->getName() + "has already been explored.";
         } else if (nearbyStructure->getBounds().w > 0) {
           message = nearbyStructure->getName() + " cannot be opened yet.";
         }
-      }
+      } else if (nearbyResource) {
 
-      else {
+        const std::string prompt =
+            nearbyResource->type == ResourceNode::Type::Tree
+                ? "E - Harvest tree"
+                : "E - Mine rock";
+
+        drawText(renderer, prompt, 32, 550, {190, 199, 170, 255});
+        const auto key =
+            resourcekey(nearbyResource->tileX, nearbyResource->tileY);
+
+        const bool isTree = nearbyResource->type == ResourceNode::Type::Tree;
+
+        const Item drop = isTree ? Item{"wood", "Wood", 1, 99}
+                                 : Item{"stone", "Stone", 1, 99};
+
+        if (inventory.addItem(drop)) {
+          harvestedResourceKeys.insert(key);
+          message = isTree ? "You gathered 1 wood." : "You collected 1 stone.";
+
+          nearbyResource = nullptr;
+        } else {
+          message = "Inventory full! make room first...";
+        }
+
+      } else {
         message = "Nothing nearby to interact with.";
       }
     }
@@ -138,10 +253,17 @@ void World::update(float deltaTime) {
 
   if (!inventoryOpen) {
     std::vector<SDL_Rect> obstacles;
-    obstacles.reserve(structures.size());
+    obstacles.reserve(structures.size() + resourceNodes.size());
 
     for (const auto &structure : structures) {
       obstacles.push_back(structure.getBounds());
+    }
+    for (const auto &node : resourceNodes) {
+      if (harvestedResourceKeys.count(resourcekey(node.tileX, node.tileY)) ==
+          0) {
+
+        obstacles.push_back(node.bounds);
+      }
     }
 
     player.update(deltaTime, obstacles);
@@ -293,6 +415,8 @@ void World::render(SDL_Renderer *renderer) const {
       SDL_SetRenderDrawColor(renderer, 35 + shade, 59 + shade, 38 + shade / 2,
                              255);
 
+      SDL_RenderFillRect(renderer, &tile);
+
       if (hash % 5 == 0) {
         const int dx = 4 + static_cast<int>((hash >> 8) % 21);
         const int dy = 4 + static_cast<int>((hash >> 16) % 21);
@@ -312,30 +436,39 @@ void World::render(SDL_Renderer *renderer) const {
         SDL_RenderFillRect(renderer, &flower);
       }
 
-      if (hash % 83 == 0) {
-        // rock
+      for (const auto &node : resourceNodes) {
+        if (harvestedResourceKeys.count(resourcekey(node.tileX, node.tileY)) !=
+            0)
+          continue;
 
-        SDL_Rect rock{tile.x + 9, tile.y + 10, 15, 12};
+        SDL_Rect drawBounds = node.bounds;
+        drawBounds.x -= static_cast<int>(cameraX);
+        drawBounds.y -= static_cast<int>(cameraY);
 
-        SDL_SetRenderDrawColor(renderer, 92, 96, 88, 255);
-        SDL_RenderFillRect(renderer, &rock);
+        if (node.type == ResourceNode::Type::Tree) {
+          SDL_Rect trunk{drawBounds.x + drawBounds.w / 2 - 3,
+                         drawBounds.y + drawBounds.h / 2, 6, drawBounds.h / 2};
 
-        SDL_SetRenderDrawColor(renderer, 125, 130, 119, 255);
-        SDL_RenderDrawLine(renderer, rock.x + 2, rock.y + 2, rock.x + 7,
-                           rock.y + 1);
-      }
+          SDL_SetRenderDrawColor(renderer, 91, 62, 39, 255);
+          SDL_RenderFillRect(renderer, &trunk);
 
-      // else if {hash}
+          SDL_Rect leaves{drawBounds.x, drawBounds.y, drawBounds.w,
+                          drawBounds.h * 2 / 3};
 
-      else if (hash % 61 == 0) {
-        SDL_Rect trunk{tile.x + 14, tile.y + 13, 4, 12};
+          SDL_SetRenderDrawColor(renderer, 39, 91, 48, 255);
+          SDL_RenderFillRect(renderer, &leaves);
 
-        SDL_RenderFillRect(renderer, &trunk);
+          SDL_SetRenderDrawColor(renderer, 60, 116, 63, 255);
+          SDL_RenderDrawRect(renderer, &leaves);
+        } else {
+          SDL_SetRenderDrawColor(renderer, 92, 96, 88, 255);
+          SDL_RenderFillRect(renderer, &drawBounds);
+          // uhhh bored
 
-        SDL_Rect leaves{tile.x + 6, tile.y + 3, 20, 15};
-
-        SDL_SetRenderDrawColor(renderer, 39, 91, 48, 255);
-        SDL_RenderFillRect(renderer, &leaves);
+          SDL_SetRenderDrawColor(renderer, 145, 149, 136, 255);
+          SDL_RenderDrawLine(renderer, drawBounds.x + 2, drawBounds.y + 3,
+                             drawBounds.x + 8, drawBounds.y + 2);
+        }
       }
     }
   }
