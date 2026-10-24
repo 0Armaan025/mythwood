@@ -6,7 +6,8 @@ public:
   Projectile(float startX, float startY, float targetX, float targetY);
 
   void update(float deltaTime);
-  void render(SDL_Renderer *renderer) const;
+  void render(SDL_Renderer *renderer, float cameraX = 0.0f,
+              float cameraY = 0.0f) const;
 
   bool isAlive() const;
   SDL_Rect getBounds() const;

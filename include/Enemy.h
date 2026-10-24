@@ -9,7 +9,8 @@ public:
   Enemy(float x, float y);
 
   void update(float deltaTime);
-  void render(SDL_Renderer *renderer) const;
+  void render(SDL_Renderer *renderer, float cameraX = 0.0f,
+              float cameraY = 0.0f) const;
 
   void takeDamage(int damage);
 

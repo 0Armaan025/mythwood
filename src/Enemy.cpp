@@ -11,12 +11,15 @@ void Enemy::update(float deltaTime) {
   hitFlashTimer = std::max(0.0f, hitFlashTimer - deltaTime);
 }
 
-void Enemy::render(SDL_Renderer *renderer) const {
+void Enemy::render(SDL_Renderer *renderer, float cameraX, float cameraY) const {
   if (!alive)
     return;
 
   const SDL_Rect body = getBounds();
 
+  SDL_Rect screenBody = body;
+  screenBody.x -= static_cast<int>(cameraX);
+  screenBody.y -= static_cast<int>(cameraY);
   if (hitFlashTimer > 0.0f)
     SDL_SetRenderDrawColor(renderer, 255, 245, 245, 255);
 
@@ -24,15 +27,16 @@ void Enemy::render(SDL_Renderer *renderer) const {
     SDL_SetRenderDrawColor(renderer, 85, 205, 110, 255);
   }
 
-  SDL_Rect slimeBody = {body.x + 2, body.y + 8, body.w - 4, body.h - 8};
+  SDL_Rect slimeBody = {screenBody.x + 2, screenBody.y + 8, screenBody.w - 4,
+                        screenBody.h - 8};
 
   SDL_RenderFillRect(renderer, &slimeBody);
 
   // eyes
 
   SDL_SetRenderDrawColor(renderer, 25, 45, 35, 255);
-  SDL_Rect leftEye = {body.x + 7, body.y + 13, 4, 5};
-  SDL_Rect rightEye = {body.x + 17, body.y + 13, 4, 5};
+  SDL_Rect leftEye = {screenBody.x + 7, screenBody.y + 13, 4, 5};
+  SDL_Rect rightEye = {screenBody.x + 17, screenBody.y + 13, 4, 5};
 
   SDL_RenderFillRect(renderer, &leftEye);
   SDL_RenderFillRect(renderer, &rightEye);
@@ -40,8 +44,8 @@ void Enemy::render(SDL_Renderer *renderer) const {
   const int barWidth = 32;
   const int barHeight = 5;
 
-  const int barX = body.x + (body.w - barWidth) / 2;
-  const int barY = body.y - 2;
+  const int barX = screenBody.x + (screenBody.w - barWidth) / 2;
+  const int barY = screenBody.y - 2;
 
   // bg
 

@@ -48,4 +48,9 @@ private:
 
   float shotCoolDown = 0.0f;
   static constexpr float SHOT_INTERVAL = 0.25f;
+
+  // CHUNK STUFFY
+
+  float cameraX = 0.0f;
+  float cameraY = 0.0f;
 };

@@ -41,13 +41,10 @@ void Projectile::update(float deltaTime) {
 
   x += velocityX * deltaTime;
   y += velocityY * deltaTime;
-
-  if (x < 0.0f || x > 960.0f || y < 0.0f || y > 640.0f) {
-    alive = false;
-  }
 }
 
-void Projectile::render(SDL_Renderer *renderer) const {
+void Projectile::render(SDL_Renderer *renderer, float cameraX,
+                        float cameraY) const {
   if (!alive) {
     return;
   }
@@ -56,8 +53,8 @@ void Projectile::render(SDL_Renderer *renderer) const {
   SDL_GetRenderDrawBlendMode(renderer, &previusBlendMode);
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-  const int centerX = static_cast<int>(x);
-  const int centerY = static_cast<int>(y);
+  const int centerX = static_cast<int>(x - cameraX);
+  const int centerY = static_cast<int>(y - cameraY);
 
   drawFilledCircle(renderer, centerX, centerY, 12, {100, 65, 255, 44});
   drawFilledCircle(renderer, centerX, centerY, 8, {145, 105, 255, 110});

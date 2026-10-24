@@ -3,7 +3,22 @@
 #include <SDL2/SDL_render.h>
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <iostream>
+
+namespace {
+constexpr int TILE_SIZE = 32;
+constexpr int CHUNK_TILES = 16;
+constexpr int CHUNK_SIZE = TILE_SIZE * CHUNK_TILES;
+
+std::uint32_t terrainHash(int x, int y) {
+  std::uint32_t h = static_cast<std::uint32_t>(x) * 374761393u +
+                    static_cast<std::uint32_t>(y) * 668265263u;
+
+  h = (h ^ (h >> 13)) * 1274126177u;
+  return h ^ (h >> 16);
+}
+} // namespace
 
 World::~World() {
   if (font)
@@ -184,8 +199,9 @@ void World::update(float deltaTime) {
     const float startX = playerBounds.x + playerBounds.w / 2.0f;
     const float startY = playerBounds.y + playerBounds.h / 2.0f;
 
-    projectiles.emplace_back(startX, startY, static_cast<float>(mouseX),
-                             static_cast<float>(mouseY));
+    projectiles.emplace_back(startX, startY,
+                             static_cast<float>(mouseX) + cameraX,
+                             static_cast<float>(mouseY) + cameraY);
 
     shotCoolDown = SHOT_INTERVAL;
   }
@@ -195,6 +211,13 @@ void World::update(float deltaTime) {
                                      return !projectile.isAlive();
                                    }),
                     projectiles.end());
+
+  // FOR INFINITE GEN SAKE
+
+  const SDL_Rect playerBounds = player.getBounds();
+
+  cameraX = playerBounds.x + playerBounds.w / 2.0f - 960.0f / 2.0f;
+  cameraY = playerBounds.y + playerBounds.h / 2.0f - 640.0f / 2.0f;
 }
 
 void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
@@ -223,22 +246,79 @@ void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
 }
 
 void World::render(SDL_Renderer *renderer) const {
+
   SDL_SetRenderDrawColor(renderer, 35, 55, 39, 255);
   SDL_RenderClear(renderer);
 
   // Grass patches
-  SDL_SetRenderDrawColor(renderer, 42, 65, 44, 255);
+  // SDL_SetRenderDrawColor(renderer, 42, 65, 44, 255);
+  //
+  // for (int i = 0; i < 30; ++i) {
+  //
+  //   const int worldX = (i * 137) % 2400;
+  //   const int worldY = (i * 193) % 1800;
+  //   SDL_Rect patch{worldX - static_cast<int>(cameraX),
+  //                  worldY - static_cast<int>(cameraY), 3, 3};
+  //   SDL_SetRenderDrawColor(renderer, 65, 115, 60, 255);
+  //   SDL_RenderFillRect(renderer, &patch);
+  // }
 
-  for (int i = 0; i < 30; ++i) {
-    SDL_Rect patch{(i * 137 + 29) % 950, 85 + (i * 83) % 530, 22, 12};
-    SDL_RenderFillRect(renderer, &patch);
+  // UPDATED GRASS PATCHES
+  // terrain
+
+  const int cameraWorldX = static_cast<int>(std::floor(cameraX));
+  const int cameraWorldY = static_cast<int>(std::floor(cameraY));
+
+  const int firstTileX =
+      static_cast<int>(std::floor(static_cast<double>(cameraX) / TILE_SIZE));
+
+  const int firstTileY =
+      static_cast<int>(std::floor(static_cast<double>(cameraY) / TILE_SIZE));
+
+  const int lastTileX =
+      static_cast<int>(std::floor((cameraX + 960.0f) / TILE_SIZE));
+
+  const int lastTileY =
+      static_cast<int>(std::floor((cameraY + 640.0f) / TILE_SIZE));
+
+  for (int ty = firstTileY; ty <= lastTileY; ++ty) {
+    for (int tx = firstTileX; tx <= lastTileX; ++tx) {
+      const std::uint32_t hash = terrainHash(tx, ty);
+
+      SDL_Rect tile{tx * TILE_SIZE - cameraWorldX,
+                    ty * TILE_SIZE - cameraWorldY, TILE_SIZE, TILE_SIZE};
+
+      const Uint8 shade = static_cast<Uint8>(hash % 12);
+
+      SDL_SetRenderDrawColor(renderer, 35 + shade, 59 + shade, 38 + shade / 2,
+                             255);
+
+      if (hash % 5 == 0) {
+        const int dx = 4 + static_cast<int>((hash >> 8) % 21);
+        const int dy = 4 + static_cast<int>((hash >> 16) % 21);
+
+        SDL_Rect patch{tile.x + dx, tile.y + dy,
+                       3 + static_cast<int>((hash >> 24) % 4), 2};
+
+        SDL_SetRenderDrawColor(renderer, 58, 91, 48, 255);
+        SDL_RenderFillRect(renderer, &patch);
+      }
+
+      // flowers coz why not soemtimeds
+
+      if (hash % 47 == 0) {
+        SDL_Rect flower{tile.x + 12, tile.y + 10, 3, 3};
+        SDL_SetRenderDrawColor(renderer, 190, 174, 125, 255);
+        SDL_RenderFillRect(renderer, &flower);
+      }
+    }
   }
 
   // Structures behind the player
   for (const auto &structure : structures)
-    structure.render(renderer);
+    structure.render(renderer, cameraX, cameraY);
 
-  player.render(renderer);
+  player.render(renderer, cameraX, cameraY);
 
   // HAND AND TIP(GUN)
 
@@ -249,10 +329,16 @@ void World::render(SDL_Renderer *renderer) const {
 
     const SDL_Rect bounds = player.getBounds();
 
-    const float cx = bounds.x + bounds.w / 2.0f;
-    const float cy = bounds.y + bounds.h / 2.0f;
+    const SDL_Rect playerBounds = player.getBounds();
 
-    const float angle = std::atan2(mouseY - cy, mouseX - cx);
+    const float playerScreenX = playerBounds.x - cameraX;
+    const float playerScreenY = playerBounds.y - cameraY;
+
+    const float cx = playerScreenX + playerBounds.w / 2.0f;
+    const float cy = playerScreenY + playerBounds.h / 2.0f;
+
+    const float angle = std::atan2(static_cast<float>(mouseY) - cy,
+                                   static_cast<float>(mouseX) - cx);
 
     const float handOffset = 8.0f;
     const float tipOffset = 20.0f;
@@ -278,11 +364,11 @@ void World::render(SDL_Renderer *renderer) const {
   }
 
   for (const auto &projectile : projectiles) {
-    projectile.render(renderer);
+    projectile.render(renderer, cameraX, cameraY);
   }
 
   for (const auto &enemy : enemies) {
-    enemy.render(renderer);
+    enemy.render(renderer, cameraX, cameraY);
   }
 
   // Top HUD

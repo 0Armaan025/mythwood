@@ -7,36 +7,46 @@
 Structure::Structure(StructureType type, SDL_Rect bounds, std::string name)
     : type(type), bounds(bounds), name(std::move(name)) {}
 
-void Structure::render(SDL_Renderer *renderer) const {
+void Structure::render(SDL_Renderer *renderer, float cameraX,
+                       float cameraY) const {
+
+  SDL_Rect drawBounds = bounds;
+
+  drawBounds.x -= static_cast<int>(cameraX);
+  drawBounds.y -= static_cast<int>(cameraY);
+
   switch (type) {
   case StructureType::Chest: {
     SDL_SetRenderDrawColor(renderer, 125, 78, 43, 255);
-    SDL_RenderFillRect(renderer, &bounds);
+    SDL_RenderFillRect(renderer, &drawBounds);
 
     SDL_SetRenderDrawColor(renderer, 214, 174, 86, 255);
-    SDL_RenderDrawRect(renderer, &bounds);
+    SDL_RenderDrawRect(renderer, &drawBounds);
 
-    SDL_RenderDrawLine(renderer, bounds.x, bounds.y + bounds.h / 2,
-                       bounds.x + bounds.w, bounds.y + bounds.h / 2);
+    SDL_RenderDrawLine(renderer, drawBounds.x, drawBounds.y + drawBounds.h / 2,
+                       drawBounds.x + drawBounds.w,
+                       drawBounds.y + drawBounds.h / 2);
 
     if (used) {
       SDL_SetRenderDrawColor(renderer, 75, 55, 35, 255);
 
-      SDL_RenderDrawLine(renderer, bounds.x + 3, bounds.y + 3,
-                         bounds.x + bounds.w - 3, bounds.y + bounds.h - 3);
+      SDL_RenderDrawLine(renderer, drawBounds.x + 3, drawBounds.y + 3,
+                         drawBounds.x + drawBounds.w - 3,
+                         drawBounds.y + drawBounds.h - 3);
     }
+
     break;
   }
 
   case StructureType::AncientShrine: {
     SDL_SetRenderDrawColor(renderer, 92, 105, 91, 255);
-    SDL_RenderFillRect(renderer, &bounds);
+    SDL_RenderFillRect(renderer, &drawBounds);
 
     SDL_SetRenderDrawColor(renderer, 148, 171, 124, 255);
-    SDL_RenderDrawRect(renderer, &bounds);
+    SDL_RenderDrawRect(renderer, &drawBounds);
 
-    SDL_Rect rune{bounds.x + bounds.w / 2 - 3, bounds.y + bounds.h / 2 - 3, 6,
-                  6};
+    SDL_Rect rune{drawBounds.x + drawBounds.w / 2 - 3,
+                  drawBounds.y + drawBounds.h / 2 - 3, 6, 6};
 
     SDL_RenderFillRect(renderer, &rune);
     break;
@@ -44,14 +54,14 @@ void Structure::render(SDL_Renderer *renderer) const {
 
   case StructureType::Cabin: {
     SDL_SetRenderDrawColor(renderer, 105, 74, 51, 255);
-    SDL_RenderFillRect(renderer, &bounds);
+    SDL_RenderFillRect(renderer, &drawBounds);
 
     SDL_SetRenderDrawColor(renderer, 65, 43, 34, 255);
 
-    SDL_Rect roof{bounds.x - 5, bounds.y - 8, bounds.w + 10, 10};
+    SDL_Rect roof{drawBounds.x - 5, drawBounds.y - 8, drawBounds.w + 10, 10};
 
     SDL_RenderFillRect(renderer, &roof);
-    SDL_RenderDrawRect(renderer, &bounds);
+    SDL_RenderDrawRect(renderer, &drawBounds);
     break;
   }
   }
