@@ -8,7 +8,7 @@ class Enemy {
 public:
   Enemy(float x, float y);
 
-  void update(float deltaTime);
+  void update(float deltaTime, const SDL_Rect &playerBounds);
   void render(SDL_Renderer *renderer, float cameraX = 0.0f,
               float cameraY = 0.0f) const;
 
@@ -28,4 +28,8 @@ private:
 
   float hitFlashTimer = 0.0f;
   bool alive = true;
+
+  float moveSpeed = 75.0f;
+  static constexpr float AGGRO_RANGE = 220.0f;
+  static constexpr float STOP_DISTANCE = 30.0f;
 };

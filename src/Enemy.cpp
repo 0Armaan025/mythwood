@@ -1,14 +1,40 @@
 #include "../include/Enemy.h"
+#include <cmath>
 
 #include <algorithm>
 
 Enemy::Enemy(float startX, float startY) : x(startX), y(startY) {}
 
-void Enemy::update(float deltaTime) {
+void Enemy::update(float deltaTime, const SDL_Rect &playerBounds) {
   if (!alive)
     return;
 
   hitFlashTimer = std::max(0.0f, hitFlashTimer - deltaTime);
+
+  const SDL_Rect enemyBounds = getBounds();
+
+  const float enemyCenterX = enemyBounds.x + enemyBounds.w / 2.0f;
+
+  const float enemyCenterY = enemyBounds.y + enemyBounds.h / 2.0f;
+
+  const float playerCenterX = playerBounds.x + playerBounds.w / 2.0f;
+
+  const float playerCenterY = playerBounds.y + playerBounds.h / 2.0f;
+
+  const float dx = playerCenterX - enemyCenterX;
+
+  const float dy = playerCenterY - enemyCenterY;
+
+  const float distance = std::sqrt(dx * dx + dy * dy);
+
+  if (distance > AGGRO_RANGE || distance <= STOP_DISTANCE) {
+    return;
+  }
+
+  if (distance > 0.0f) {
+    x += (dx / distance) * moveSpeed * deltaTime;
+    y += (dy / distance) * moveSpeed * deltaTime;
+  }
 }
 
 void Enemy::render(SDL_Renderer *renderer, float cameraX, float cameraY) const {

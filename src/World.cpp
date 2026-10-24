@@ -74,6 +74,11 @@ void World::start() {
 
   attackAnimationTimer = 0.0f;
 
+  playerHealth = MAX_PLAYER_HEALTH;
+  playerDamageCoolDown = 0.0f;
+  playerDead = false;
+  respawnTimer = 0.0f;
+
   structures.emplace_back(StructureType::Chest, SDL_Rect{390, 270, 34, 28},
                           "Old Chest");
 
@@ -349,8 +354,50 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
 
   previousAttack = attackDown;
 
+  const SDL_Rect boundsOfPlayer = player.getBounds();
+
+  playerDamageCoolDown = std::max(0.0f, playerDamageCoolDown - deltaTime);
+
+  if (playerDead) {
+    respawnTimer = respawnTimer - deltaTime;
+
+    if (respawnTimer <= 0.0f) {
+      player.reset();
+      playerHealth = MAX_PLAYER_HEALTH;
+      playerDamageCoolDown = 0.0f;
+      playerDead = false;
+      message = " You recovered and returned to the forest. ";
+    }
+  } else {
+
+    const SDL_Rect playerBounds = player.getBounds();
+
+    for (auto &enemy : enemies) {
+      enemy.update(deltaTime, playerBounds);
+
+      if (enemy.isAlive() || playerDamageCoolDown > 0.0f) {
+        continue;
+      }
+
+      const SDL_Rect enemyBounds = enemy.getBounds();
+
+      if (SDL_HasIntersection(&playerBounds, &enemyBounds)) {
+        playerHealth = std::max(0, playerHealth - 10);
+        playerDamageCoolDown = PLAYER_DAMAGE_COOLDOWN;
+
+        message = "Slime hit u heehehe, noob";
+
+        if (playerHealth <= 0) {
+          playerDead = true;
+          respawnTimer = RESPAWN_DELAY;
+          message = "you were defeated...";
+        }
+      }
+    }
+  }
+
   for (auto &enemy : enemies) {
-    enemy.update(deltaTime);
+    enemy.update(deltaTime, boundsOfPlayer);
   }
 
   for (auto &projectile : projectiles) {
@@ -618,6 +665,33 @@ void World::render(SDL_Renderer *renderer) const {
 
   drawText(renderer, "MYTHWOOD", 24, 17, {220, 204, 158, 255});
   // Interaction feedback
+
+  constexpr int healthBarX = 180;
+  constexpr int healthBarY = 20;
+  constexpr int healthBarWidth = 160;
+  constexpr int healthBarHeight = 16;
+
+  SDL_SetRenderDrawColor(renderer, 55, 35, 35, 255);
+
+  SDL_Rect healthBackground{healthBarX, healthBarY, healthBarWidth,
+                            healthBarHeight};
+  SDL_RenderFillRect(renderer, &healthBackground);
+  const float healthRatio =
+      static_cast<float>(playerHealth) / MAX_PLAYER_HEALTH;
+  SDL_SetRenderDrawColor(renderer, 190, 65, 70, 255);
+  SDL_Rect healthForeground{
+      healthBarX + 2, healthBarY + 2,
+      static_cast<int>((healthBarWidth - 4) * healthRatio),
+      healthBarHeight - 4};
+
+  SDL_RenderFillRect(renderer, &healthForeground);
+
+  drawText(renderer,
+           "HP " + std::to_string(playerHealth) + "/" +
+               std::to_string(MAX_PLAYER_HEALTH),
+           healthBarX + healthBarWidth + 10, healthBarY - 2,
+           {220, 204, 158, 255});
+
   SDL_SetRenderDrawColor(renderer, 20, 29, 25, 230);
   SDL_Rect messagePanel{20, 570, 500, 48};
   SDL_RenderFillRect(renderer, &messagePanel);

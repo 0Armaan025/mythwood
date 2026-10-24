@@ -40,6 +40,15 @@ private:
   Player player;
   Inventory inventory;
   std::vector<Structure> structures;
+  int playerHealth = 100;
+  static constexpr int MAX_PLAYER_HEALTH = 100;
+
+  float playerDamageCoolDown = 0.0f;
+  static constexpr float PLAYER_DAMAGE_COOLDOWN = 1.0f;
+
+  bool playerDead = false;
+  float respawnTimer = 0.0f;
+  static constexpr float RESPAWN_DELAY = 1.5f;
 
   TTF_Font *font = nullptr;
   std::vector<Enemy> enemies;
