@@ -311,6 +311,32 @@ void World::render(SDL_Renderer *renderer) const {
         SDL_SetRenderDrawColor(renderer, 190, 174, 125, 255);
         SDL_RenderFillRect(renderer, &flower);
       }
+
+      if (hash % 83 == 0) {
+        // rock
+
+        SDL_Rect rock{tile.x + 9, tile.y + 10, 15, 12};
+
+        SDL_SetRenderDrawColor(renderer, 92, 96, 88, 255);
+        SDL_RenderFillRect(renderer, &rock);
+
+        SDL_SetRenderDrawColor(renderer, 125, 130, 119, 255);
+        SDL_RenderDrawLine(renderer, rock.x + 2, rock.y + 2, rock.x + 7,
+                           rock.y + 1);
+      }
+
+      // else if {hash}
+
+      else if (hash % 61 == 0) {
+        SDL_Rect trunk{tile.x + 14, tile.y + 13, 4, 12};
+
+        SDL_RenderFillRect(renderer, &trunk);
+
+        SDL_Rect leaves{tile.x + 6, tile.y + 3, 20, 15};
+
+        SDL_SetRenderDrawColor(renderer, 39, 91, 48, 255);
+        SDL_RenderFillRect(renderer, &leaves);
+      }
     }
   }
 
