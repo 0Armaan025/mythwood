@@ -1,10 +1,15 @@
 #include "../include/World.h"
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_video.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+
+#include <fstream>
+#include <iomanip>
+#include <limits>
 
 namespace {
 constexpr int TILE_SIZE = 32;
@@ -54,6 +59,13 @@ void World::start() {
   inventory = Inventory{};
   structures.clear();
 
+  resourceNodes.clear();
+  harvestedResourceKeys.clear();
+  nearbyResource = nullptr;
+  nearbyStructure = nullptr;
+  cameraX = 0.0f;
+  cameraY = 0.0f;
+
   structures.emplace_back(StructureType::Chest, SDL_Rect{390, 270, 34, 28},
                           "Old Chest");
 
@@ -74,6 +86,10 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   const Uint8 *keys = SDL_GetKeyboardState(nullptr);
 
   if (keys[SDL_SCANCODE_ESCAPE]) {
+    if (!saveGame()) {
+      message = "Warning: could not save the game!";
+    }
+
     returnToMenu = true;
     return;
   }
@@ -224,7 +240,6 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
                 ? "E - Harvest tree"
                 : "E - Mine rock";
 
-        drawText(renderer, prompt, 32, 550, {190, 199, 170, 255});
         const auto key =
             resourcekey(nearbyResource->tileX, nearbyResource->tileY);
 
@@ -586,3 +601,159 @@ void World::render(SDL_Renderer *renderer) const {
 }
 
 bool World::shouldReturnToMenu() const { return returnToMenu; }
+
+bool World::saveGame() const {
+  const std::string tempPath = "mythwood_save.tmp";
+  const std::string savePath = "mythwood_save.dat";
+
+  std::ofstream out(tempPath, std::ios::trunc);
+
+  if (!out)
+    return false;
+
+  out << "MYTHWOOD_SAVE 1\n";
+  out << std::setprecision(std::numeric_limits<float>::max_digits10);
+
+  out << player.getX() << ' ' << player.getY() << '\n';
+
+  const auto &items = inventory.getItems();
+  out << items.size() << '\n';
+
+  for (const auto &item : items) {
+    out << std::quoted(item.id) << ' ' << std::quoted(item.name) << ' '
+        << item.quantity << ' ' << item.maxStack << '\n';
+  }
+
+  out << structures.size() << '\n';
+
+  for (const auto &structure : structures) {
+    out << structure.isUsed() << '\n';
+  }
+  out << harvestedResourceKeys.size() << '\n';
+  for (const auto key : harvestedResourceKeys) {
+    out << key << '\n';
+  }
+
+  out.close();
+
+  if (!out) {
+    return false;
+  }
+
+  if (std::rename(tempPath.c_str(), savePath.c_str()) != 0) {
+    return false;
+  }
+
+  return true;
+}
+
+bool World::loadGame() {
+  std::ifstream in("mythwood_save.dat");
+
+  if (!in)
+    return false;
+
+  std::string magic;
+  int version = 0;
+
+  if (!(in >> magic >> version) || magic != "MYTHWOOD_SAVE" || version != 1) {
+    return false;
+  }
+
+  float loadedX = 0.0f;
+  float loadedY = 0.0f;
+
+  if (!(in >> loadedX >> loadedY) || !std::isfinite(loadedX) ||
+      !std::isfinite(loadedY)) {
+    return false;
+  }
+
+  // million for now ig
+  constexpr float MAX_WORLD_COORDINATESS = 1000000.0f;
+
+  if (std::abs(loadedX) > MAX_WORLD_COORDINATESS ||
+      std::abs(loadedY) > MAX_WORLD_COORDINATESS) {
+    return false;
+  }
+
+  std::size_t itemCount = 0;
+  if (!(in >> itemCount) || itemCount > 20) {
+    return false;
+  }
+
+  std::vector<Item> loadedItems;
+  // loadedItems.reserve(itemCountt)
+  loadedItems.reserve(itemCount);
+
+  for (std::size_t i = 0; i < itemCount; ++i) {
+    Item item;
+
+    if (!(in >> std::quoted(item.id) >> std::quoted(item.name) >>
+          item.quantity >> item.maxStack))
+      return false;
+
+    if (item.id.empty() || item.name.empty() || item.quantity <= 0 ||
+        item.maxStack <= 0 || item.quantity > item.maxStack)
+      return false;
+
+    loadedItems.push_back(std::move(item));
+  }
+
+  std::size_t structureCount = 0;
+  if (!(in >> structureCount) || structureCount != 3)
+    return false;
+
+  std::vector<bool> loadedStructureStates;
+  loadedStructureStates.reserve(structureCount);
+
+  for (std::size_t i = 0; i < structureCount; ++i) {
+    int used = 0;
+
+    if (!(in >> used) || (used != 0 && used != 1)) {
+      return false;
+    }
+
+    loadedStructureStates.push_back(used == 1);
+  }
+
+  std::size_t harvestedCount = 0;
+
+  if (!(in >> harvestedCount) || harvestedCount > 1000000)
+    return false;
+
+  std::unordered_set<std::uint64_t> loadedHarvestedKeys;
+
+  for (std::size_t i = 0; i < harvestedCount; ++i) {
+    std::uint64_t key = 0;
+    if (!(in >> key)) {
+      return false;
+    }
+
+    loadedHarvestedKeys.insert(key);
+  }
+
+  Inventory validatedInventory;
+
+  if (!validatedInventory.setItems(loadedItems))
+    return false;
+
+  // finally start
+
+  start();
+
+  player.setPosition(loadedX, loadedY);
+  inventory.setItems(loadedItems);
+  for (std::size_t i = 0; i < structures.size(); ++i) {
+    structures[i].setUsed(loadedStructureStates[i]);
+  }
+
+  harvestedResourceKeys = std::move(loadedHarvestedKeys);
+
+  const SDL_Rect bounds = player.getBounds();
+  cameraX = bounds.x + bounds.w / 2.0f - 480.0f;
+  cameraY = bounds.y + bounds.h / 2.0f - 320.0f;
+
+  message = "Save loaded successfully.";
+  returnToMenu = false;
+  return true;
+}

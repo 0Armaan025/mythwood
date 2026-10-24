@@ -40,6 +40,12 @@ void Game::run() {
         playing = true;
       }
 
+      if (mainMenu.takeContinueRequest()) {
+        if (world.loadGame()) {
+          playing = true;
+        }
+      }
+
       mainMenu.render(window.getRenderer());
     } else {
       world.update(deltaTime, window.getRenderer());

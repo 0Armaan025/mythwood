@@ -16,6 +16,10 @@ public:
 
   SDL_Rect getBounds() const;
 
+  float getX() const;
+  float getY() const;
+  void setPosition(float newX, float newY);
+
 private:
   float x = 480.0f;
   float y = 350.0f;

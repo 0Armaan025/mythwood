@@ -22,6 +22,7 @@ public:
   //
 
   bool takeNewGameRequest();
+  bool takeContinueRequest();
 
 private:
   TTF_Font *titleFont = nullptr;
@@ -52,6 +53,7 @@ private:
   // thought id' make
 
   bool newGameRequested = false;
+  bool continueRequested = false;
 };
 
 // ARE ALL OF US RIDING TO OUR DEATHS!? YES, WE ARE!!! MY SOLIDERS SCREAM, MY

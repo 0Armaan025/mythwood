@@ -114,3 +114,5 @@ bool Structure::interact(Inventory &inventory) {
 const std::string &Structure::getName() const { return name; }
 
 bool Structure::isUsed() const { return used; }
+
+void Structure::setUsed(bool value) { used = value; }

@@ -60,6 +60,8 @@ bool MainMenu::update() {
       if (mouseDown && !mouseWasDown) {
         if (i == 0) {
           newGameRequested = true;
+        } else if (i == 1) {
+          continueRequested = true;
         } else if (i == 3)
           return false;
 
@@ -133,5 +135,11 @@ void MainMenu::render(SDL_Renderer *renderer) {
 bool MainMenu::takeNewGameRequest() {
   bool requested = newGameRequested;
   newGameRequested = false;
+  return requested;
+}
+
+bool MainMenu::takeContinueRequest() {
+  const bool requested = continueRequested;
+  continueRequested = false;
   return requested;
 }

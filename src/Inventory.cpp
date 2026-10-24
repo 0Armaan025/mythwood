@@ -83,3 +83,18 @@ int Inventory::countItem(const string &id) const {
 }
 
 const vector<Item> &Inventory::getItems() const { return items; }
+
+bool Inventory::setItems(const std::vector<Item> &loadedItems) {
+  if (loadedItems.size() > MAX_SLOTS)
+    return false;
+
+  for (const auto &item : loadedItems) {
+    if (item.id.empty() || item.name.empty() || item.quantity <= 0 ||
+        item.maxStack <= 0 || item.quantity > item.maxStack) {
+      return false;
+    }
+  }
+
+  items = loadedItems;
+  return true;
+}

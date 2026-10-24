@@ -21,6 +21,8 @@ public:
 
   const std::vector<Item> &getItems() const;
 
+  bool setItems(const std::vector<Item> &loadedItems);
+
 private:
   vector<Item> items;
   static constexpr int MAX_SLOTS = 20;

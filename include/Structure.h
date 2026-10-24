@@ -22,6 +22,7 @@ public:
   bool isUsed() const;
 
   SDL_Rect getBounds() const;
+  void setUsed(bool value);
 
 private:
   StructureType type;

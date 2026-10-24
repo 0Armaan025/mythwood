@@ -160,3 +160,13 @@ void Player::reset() {
   x = 480.0f;
   y = 350.0f;
 }
+
+float Player::getX() const { return x; }
+float Player::getY() const { return y; }
+
+void Player::setPosition(float newX, float newY) {
+  x = newX;
+  y = newY;
+  isMoving = false;
+  walkTime = 0.0f;
+}

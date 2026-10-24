@@ -33,6 +33,9 @@ public:
   void render(SDL_Renderer *renderer) const;
   bool shouldReturnToMenu() const; // yay at least this has been done :P
 
+  bool saveGame() const;
+  bool loadGame();
+
 private:
   Player player;
   Inventory inventory;
