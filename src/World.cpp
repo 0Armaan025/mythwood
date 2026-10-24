@@ -1,5 +1,6 @@
 #include "../include/World.h"
 #include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_video.h>
 #include <algorithm>
@@ -10,6 +11,8 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+
+#include <type_traits>
 
 namespace {
 constexpr int TILE_SIZE = 32;
@@ -65,6 +68,11 @@ void World::start() {
   nearbyStructure = nullptr;
   cameraX = 0.0f;
   cameraY = 0.0f;
+
+  previousAttack = false;
+  attackCooldown = 0.0f;
+
+  attackAnimationTimer = 0.0f;
 
   structures.emplace_back(StructureType::Chest, SDL_Rect{390, 270, 34, 28},
                           "Old Chest");
@@ -285,6 +293,61 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   }
 
   shotCoolDown = shotCoolDown - deltaTime;
+
+  attackCooldown = std::max(0.0f, attackCooldown - deltaTime);
+
+  attackAnimationTimer = std::max(0.0f, attackAnimationTimer - deltaTime);
+
+  const Uint8 *attackKeys = SDL_GetKeyboardState(nullptr);
+  const bool attackDown = attackKeys[SDL_SCANCODE_SPACE];
+
+  if (!inventoryOpen && attackDown && !previousAttack &&
+      attackCooldown <= 0.0f) {
+    const SDL_Rect playerBounds = player.getBounds();
+
+    constexpr int attackWidth = 34;
+    constexpr int attackHeight = 30;
+
+    SDL_Rect attackBounds{};
+
+    const float fx = player.getFacingX();
+    const float fy = player.getFacingY();
+
+    if (fx < 0.0f) {
+      attackBounds = {playerBounds.x - attackWidth,
+                      playerBounds.y + (playerBounds.h - attackHeight) / 2,
+                      attackWidth, attackHeight};
+
+    } else if (fx > 0.0f) {
+
+      attackBounds = {playerBounds.x + (playerBounds.w - attackWidth) / 2,
+                      playerBounds.y - attackHeight, attackWidth, attackHeight};
+
+    }
+
+    else {
+      attackBounds = {playerBounds.x + (playerBounds.w - attackWidth) / 2,
+                      playerBounds.y + playerBounds.h, attackWidth,
+                      attackHeight};
+    }
+    for (auto &enemy : enemies) {
+      if (!enemy.isAlive()) {
+        continue;
+      }
+
+      SDL_Rect enemyBounds = enemy.getBounds();
+
+      if (SDL_HasIntersection(&attackBounds, &enemyBounds)) {
+        cout << "has intersection" << endl;
+        enemy.takeDamage(MELEE_DAMAGE);
+      }
+
+      attackCooldown = ATTACK_COOLDOWN;
+      attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+    }
+  }
+
+  previousAttack = attackDown;
 
   for (auto &enemy : enemies) {
     enemy.update(deltaTime);

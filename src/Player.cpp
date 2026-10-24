@@ -36,6 +36,10 @@ void Player::update(float deltaTime, const std::vector<SDL_Rect> &obstacles) {
     dx *= 0.70710678f;
     dy *= 0.70710678f;
   }
+  if (dx != 0.0f || dy != 0.0f) {
+    facingX = dx;
+    facingY = dy;
+  }
 
   const float moveX = dx * speed * deltaTime;
   const float moveY = dy * speed * deltaTime;
@@ -170,3 +174,6 @@ void Player::setPosition(float newX, float newY) {
   isMoving = false;
   walkTime = 0.0f;
 }
+float Player::getFacingX() const { return facingX; }
+
+float Player::getFacingY() const { return facingY; }

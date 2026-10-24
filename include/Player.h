@@ -19,6 +19,8 @@ public:
   float getX() const;
   float getY() const;
   void setPosition(float newX, float newY);
+  float getFacingX() const;
+  float getFacingY() const;
 
 private:
   float x = 480.0f;
@@ -26,4 +28,7 @@ private:
   float speed = 220.0f;
   float walkTime = 0.0f;
   bool isMoving = false;
+
+  float facingX = 0.0f;
+  float facingY = 1.0f;
 };

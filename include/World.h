@@ -49,6 +49,15 @@ private:
   bool previousE = false;
   bool previousI = false;
 
+  bool previousAttack = false;
+
+  float attackCooldown = 0.0f;
+  float attackAnimationTimer = 0.0f;
+
+  static constexpr float ATTACK_COOLDOWN = 0.35f;
+  static constexpr float ATTACK_ANIMATION_DURATION = 0.12f;
+  static constexpr int MELEE_DAMAGE = 10;
+
   Structure *nearbyStructure = nullptr;
 
   string message = "Explore the forest.";
