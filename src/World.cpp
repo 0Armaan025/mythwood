@@ -198,7 +198,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     }
   }
 
-  if (buyLauncherDown && !previousBuyLauncher) {
+  if (shopOpen && buyLauncherDown && !previousBuyLauncher) {
     if (hasRocketLauncher) {
       message = "You already own the Chaos Launcher!";
     } else if (coins < ROCKET_LAUNCHER_PRICE) {
@@ -210,6 +210,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
       launcherEquipped = true;
       rocketAmmo = STARTING_ROCKET_AMMO;
 
+      magicEquipped = false;
       message = "CHAOS LAUNCHER acquired! Press R to equip!";
     }
   }
@@ -246,6 +247,10 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
 
     else {
       launcherEquipped = !launcherEquipped;
+      if (launcherEquipped) {
+
+        magicEquipped = false;
+      }
 
       message = launcherEquipped
                     ? "CHAOS Launcher Equipped!"
@@ -261,6 +266,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
       magicEquipped = false;
       message = "Moonfire Sigil unequipped";
     } else if (inventory.countItem("moonfire_sigil") > 0) {
+      launcherEquipped = false;
       magicEquipped = true;
       message = "Moonfire Sigil equipped! Left-click to cast.";
     } else {
@@ -570,80 +576,6 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
       }
     }
 
-    for (auto &rocket : rockets) {
-      rocket.update(deltaTime);
-
-      if (rocket.isFlying()) {
-        const SDL_Rect rocketBounds = rocket.getBounds();
-
-        for (const auto &enemy : enemies) {
-          if (!enemy.isAlive()) {
-            continue;
-          }
-
-          const SDL_Rect enemyBounds = enemy.getBounds();
-
-          if (SDL_HasIntersection(&rocketBounds, &enemyBounds)) {
-            rocket.beginExplosion();
-            break;
-          }
-        }
-        if (rocket.isFlying()) {
-          for (const auto &structure : structures) {
-
-            const SDL_Rect structureBounds = structure.getBounds();
-
-            if (SDL_HasIntersection(&rocketBounds, &structureBounds)) {
-              // im tireeeeeeedddddddddd audashfalsdjfdlasjl
-
-              rocket.beginExplosion();
-              break;
-            }
-          }
-        }
-      }
-
-      if (!rocket.consumeBlast()) {
-        continue;
-      }
-
-      const float blastX = rocket.getCenterX();
-      const float blastY = rocket.getCenterY();
-
-      for (auto &enemy : enemies) {
-        if (!enemy.isAlive()) {
-          continue;
-        }
-
-        const SDL_Rect bounds = enemy.getBounds();
-
-        const float enemyX = bounds.x + bounds.w / 2.0f;
-        const float enemyY = bounds.y + bounds.h / 2.0f;
-
-        const float dx = enemyX - blastX;
-        const float dy = enemyY - blastY;
-        const float distance = std::sqrt(dx * dx + dy * dy);
-
-        if (distance > Rocket::BLAST_RADIUS) {
-          continue;
-        }
-
-        enemy.takeDamage(Rocket::BLAST_DAMAGE);
-
-        const float strength =
-            Rocket::KNOCKBACK_FORCE * (1.0f - distance / Rocket::BLAST_RADIUS);
-
-        if (strength > 0.0f) {
-          enemy.applyKnockback(blastX, blastY, strength);
-        }
-      }
-    }
-
-    rockets.erase(
-        std::remove_if(rockets.begin(), rockets.end(),
-                       [](const Rocket &rocket) { return !rocket.isAlive(); }),
-        rockets.end());
-
     for (const auto &structure : structures) {
       const SDL_Rect structureBounds = structure.getBounds();
 
@@ -654,6 +586,79 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
       }
     }
   }
+  for (auto &rocket : rockets) {
+    rocket.update(deltaTime);
+
+    if (rocket.isFlying()) {
+      const SDL_Rect rocketBounds = rocket.getBounds();
+
+      for (const auto &enemy : enemies) {
+        if (!enemy.isAlive()) {
+          continue;
+        }
+
+        const SDL_Rect enemyBounds = enemy.getBounds();
+
+        if (SDL_HasIntersection(&rocketBounds, &enemyBounds)) {
+          rocket.beginExplosion();
+          break;
+        }
+      }
+      if (rocket.isFlying()) {
+        for (const auto &structure : structures) {
+
+          const SDL_Rect structureBounds = structure.getBounds();
+
+          if (SDL_HasIntersection(&rocketBounds, &structureBounds)) {
+            // im tireeeeeeedddddddddd audashfalsdjfdlasjl
+
+            rocket.beginExplosion();
+            break;
+          }
+        }
+      }
+    }
+
+    if (!rocket.consumeBlast()) {
+      continue;
+    }
+
+    const float blastX = rocket.getCenterX();
+    const float blastY = rocket.getCenterY();
+
+    for (auto &enemy : enemies) {
+      if (!enemy.isAlive()) {
+        continue;
+      }
+
+      const SDL_Rect bounds = enemy.getBounds();
+
+      const float enemyX = bounds.x + bounds.w / 2.0f;
+      const float enemyY = bounds.y + bounds.h / 2.0f;
+
+      const float dx = enemyX - blastX;
+      const float dy = enemyY - blastY;
+      const float distance = std::sqrt(dx * dx + dy * dy);
+
+      if (distance > Rocket::BLAST_RADIUS) {
+        continue;
+      }
+
+      enemy.takeDamage(Rocket::BLAST_DAMAGE);
+
+      const float strength =
+          Rocket::KNOCKBACK_FORCE * (1.0f - distance / Rocket::BLAST_RADIUS);
+
+      if (strength > 0.0f) {
+        enemy.applyKnockback(blastX, blastY, strength);
+      }
+    }
+  }
+
+  rockets.erase(
+      std::remove_if(rockets.begin(), rockets.end(),
+                     [](const Rocket &rocket) { return !rocket.isAlive(); }),
+      rockets.end());
 
   int mouseX = 0;
   int mouseY = 0;
@@ -684,7 +689,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   const SDL_Rect playerBounds = player.getBounds();
 
   if (!inventoryOpen && !shopOpen && launcherEquipped &&
-      (mouseButtons && SDL_BUTTON_LMASK) && rocketCooldown <= 0.0f) {
+      (mouseButtons & SDL_BUTTON_LMASK) && rocketCooldown <= 0.0f) {
   }
 
   if (rocketAmmo <= 0) {
