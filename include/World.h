@@ -91,4 +91,15 @@ private:
 
   float cameraX = 0.0f;
   float cameraY = 0.0f;
+
+  // ECONOMY
+
+  int coins = 0;
+  bool shopOpen = false;
+
+  bool previousShopSellWood = false;
+  bool previousShopSellStone = false;
+
+  static constexpr int WOOD_SELL_PRICE = 3;
+  static constexpr int STONE_SELL_PRICE = 2;
 };

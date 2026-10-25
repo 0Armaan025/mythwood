@@ -62,6 +62,10 @@ void World::start() {
   inventory = Inventory{};
   structures.clear();
 
+  coins = 0;
+  shopOpen = false;
+  previousShopSellWood = false;
+  previousShopSellStone = false;
   resourceNodes.clear();
   harvestedResourceKeys.clear();
   nearbyResource = nullptr;
@@ -88,6 +92,9 @@ void World::start() {
   structures.emplace_back(StructureType::Cabin, SDL_Rect{140, 160, 100, 80},
                           "Forest Cabin");
 
+  structures.emplace_back(StructureType::Merchant, SDL_Rect{300, 160, 54, 58},
+                          "Forest Merchant");
+
   inventoryOpen = false;
   returnToMenu = false;
   previousE = false;
@@ -110,6 +117,44 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   const bool eDown = keys[SDL_SCANCODE_E];
   const bool iDown = keys[SDL_SCANCODE_I];
   const bool pDown = keys[SDL_SCANCODE_P];
+
+  const bool sellWoodDown = keys[SDL_SCANCODE_1];
+  const bool sellStoneDown = keys[SDL_SCANCODE_2];
+
+  if (shopOpen) {
+    if (eDown && !previousE) {
+      shopOpen = false;
+      message = "Come back anytime.";
+    }
+
+    if (sellWoodDown && !previousShopSellWood) {
+      const int amount = inventory.countItem("wood");
+
+      if (amount > 0 && inventory.removeItem("wood", amount)) {
+        coins += amount * WOOD_SELL_PRICE;
+        message = "Sold " + std::to_string(amount) + " wood for " +
+                  std::to_string(amount * WOOD_SELL_PRICE) + " coins.";
+      } else {
+        message = "You don't have any wood to sell.";
+      }
+    }
+
+    if (sellStoneDown && !previousShopSellStone) {
+      const int amount = inventory.countItem("stone");
+
+      if (amount > 0 && inventory.removeItem("stone", amount)) {
+        coins += amount * STONE_SELL_PRICE;
+        message = "Sold " + std::to_string(amount) + " stone for " +
+                  std::to_string(amount * STONE_SELL_PRICE) + " coins.";
+
+      } else {
+        message = "You don't have any stone to sell.";
+      }
+    }
+  }
+
+  previousShopSellWood = sellWoodDown;
+  previousShopSellStone = sellStoneDown;
 
   if (iDown && !previousI)
     inventoryOpen = !inventoryOpen;
@@ -167,7 +212,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     }
   }
 
-  if (!inventoryOpen) {
+  if (!inventoryOpen && !shopOpen) {
     for (auto &structure : structures) {
       if (structure.isNear(player.getBounds())) {
         nearbyStructure = &structure;
@@ -211,7 +256,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   nearbyStructure = nullptr;
   nearbyResource = nullptr;
 
-  if (!inventoryOpen) {
+  if (!inventoryOpen && !shopOpen) {
     for (auto &structure : structures) {
       if (structure.isNear(player.getBounds())) {
         nearbyStructure = &structure;
@@ -237,8 +282,13 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     }
 
     if (eDown && !previousE && !inventoryOpen) {
+
       if (nearbyStructure) {
-        if (nearbyStructure->interact(inventory)) {
+        if (nearbyStructure->getType() == StructureType::Merchant) {
+          shopOpen = true;
+          inventoryOpen = false;
+          message = "Welcome! Sell your resources with 1 or 2.";
+        } else if (nearbyStructure->interact(inventory)) {
           message = "Found something at " + nearbyStructure->getName() + "!";
         } else if (nearbyStructure->isUsed()) {
 
@@ -375,7 +425,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     for (auto &enemy : enemies) {
       enemy.update(deltaTime, playerBounds);
 
-      if (enemy.isAlive() || playerDamageCoolDown > 0.0f) {
+      if (!enemy.isAlive() || playerDamageCoolDown > 0.0f) {
         continue;
       }
 
@@ -726,6 +776,27 @@ void World::render(SDL_Renderer *renderer) const {
                {190, 199, 170, 255});
 
       y += 30;
+    }
+
+    if (shopOpen) {
+      SDL_SetRenderDrawColor(renderer, 20, 29, 25, 245);
+      SDL_Rect panel{260, 150, 440, 330};
+      SDL_RenderFillRect(renderer, &panel);
+
+      SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
+      SDL_RenderDrawRect(renderer, &panel);
+
+      drawText(renderer, "FOREST MERCHANT", 290, 175, {220, 204, 158, 255});
+      drawText(renderer, "Coins: " + std::to_string(coins), 290, 215,
+               {240, 204, 158, 95});
+
+      drawText(renderer, "1 - Sell all wood (3 coins each)", 290, 265,
+               {190, 199, 170, 255});
+
+      drawText(renderer, "2 - Sell all stone (2 coins each)", 290, 305,
+               {190, 199, 170, 255});
+
+      drawText(renderer, "E - Leave shop", 290, 380, {160, 174, 142, 255});
     }
 
     if (inventory.getItems().empty())

@@ -64,6 +64,32 @@ void Structure::render(SDL_Renderer *renderer, float cameraX,
     SDL_RenderDrawRect(renderer, &drawBounds);
     break;
   }
+
+  case StructureType::Merchant: {
+    // stall
+    //
+
+    SDL_SetRenderDrawColor(renderer, 112, 75, 45, 255);
+    SDL_RenderFillRect(renderer, &drawBounds);
+
+    // green something
+
+    SDL_Rect awning{drawBounds.x - 4, drawBounds.y - 8, drawBounds.w + 8, 12};
+
+    SDL_SetRenderDrawColor(renderer, 74, 125, 75, 255);
+    SDL_RenderFillRect(renderer, &awning);
+
+    // counter
+
+    SDL_Rect counter{drawBounds.x + 3, drawBounds.y + drawBounds.h / 2,
+                     drawBounds.w - 6, 8};
+
+    SDL_SetRenderDrawColor(renderer, 164, 119, 72, 255);
+
+    SDL_RenderFillRect(renderer, &counter);
+
+    break;
+  }
   }
 }
 
@@ -106,6 +132,9 @@ bool Structure::interact(Inventory &inventory) {
   case StructureType::Cabin: {
     return false;
   }
+
+  case StructureType::Merchant:
+    return false;
   }
 
   return false;
@@ -116,3 +145,5 @@ const std::string &Structure::getName() const { return name; }
 bool Structure::isUsed() const { return used; }
 
 void Structure::setUsed(bool value) { used = value; }
+
+StructureType Structure::getType() const { return type; }

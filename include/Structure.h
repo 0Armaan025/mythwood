@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <string>
 
-enum class StructureType { Chest, AncientShrine, Cabin };
+enum class StructureType { Chest, AncientShrine, Cabin, Merchant };
 
 class Structure {
 public:
@@ -23,6 +23,7 @@ public:
 
   SDL_Rect getBounds() const;
   void setUsed(bool value);
+  StructureType getType() const;
 
 private:
   StructureType type;
