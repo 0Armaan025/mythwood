@@ -44,10 +44,28 @@ bool MainMenu::init() {
 // alright, the fun part:
 
 bool MainMenu::update() {
-  int mouseX, mouseY;
+  int mouseX = 0, mouseY = 0;
   const Uint32 mouse = SDL_GetMouseState(&mouseX, &mouseY);
   const bool mouseDown = mouse & SDL_BUTTON(SDL_BUTTON_LEFT);
   hoveredButton = -1;
+  hoveredTutorialBlack = -1;
+
+  if (howToPlayOpen) {
+    const SDL_Rect backButton{360, 535, 240, 48};
+
+    if (mouseX >= backButton.x && mouseX < backButton.x + backButton.w &&
+        mouseY >= backButton.y && mouseY < backButton.y + backButton.h) {
+      hoveredTutorialBlack = 0;
+
+      if (mouseDown && !mouseWasDown) {
+        howToPlayOpen = false;
+      }
+    }
+
+    mouseWasDown = mouseDown;
+
+    return true;
+  }
 
   for (int i = 0; i < 4; ++i) {
     const auto &r = buttons[i].rect; // thanks to auto keyword otherwise it was
@@ -62,6 +80,11 @@ bool MainMenu::update() {
           newGameRequested = true;
         } else if (i == 1) {
           continueRequested = true;
+
+        }
+
+        else if (i == 2) {
+          howToPlayOpen = true;
         } else if (i == 3)
           return false;
 
@@ -94,6 +117,11 @@ void MainMenu::drawText(SDL_Renderer *renderer, TTF_Font *font,
   SDL_FreeSurface(surface);
 }
 void MainMenu::render(SDL_Renderer *renderer) {
+
+  if (howToPlayOpen) {
+    drawTutorial(renderer);
+    return;
+  }
   SDL_SetRenderDrawColor(renderer, 24, 35, 30, 255);
   SDL_RenderClear(renderer);
 
@@ -142,4 +170,68 @@ bool MainMenu::takeContinueRequest() {
   const bool requested = continueRequested;
   continueRequested = false;
   return requested;
+}
+
+void MainMenu::drawTutorial(SDL_Renderer *renderer) {
+  SDL_SetRenderDrawColor(renderer, 24, 35, 30, 255);
+  SDL_RenderClear(renderer);
+  // man, im really tired rn, this requires a lot fo solving thingy i.e
+  // intellectual stuff just to plan everything and coordinate, omg game making
+  // is tuff
+
+  // i'll make something easier next time
+
+  SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
+  SDL_Rect border{28, 28, 904, 584};
+  SDL_RenderDrawRect(renderer, &border);
+
+  drawText(renderer, titleFont, "HOW TO PLAY", 55, parchment);
+  drawText(renderer, buttonFont, "Explore. Gather. Fight. Discover.", 130,
+           greeny_green);
+
+  // controls
+
+  SDL_SetRenderDrawColor(renderer, 35, 48, 40, 255);
+  SDL_Rect panel{110, 185, 740, 315};
+  SDL_RenderFillRect(renderer, &panel);
+
+  SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
+  SDL_RenderDrawRect(renderer, &panel);
+
+  const SDL_Color textColor{220, 204, 158, 255};
+
+  drawText(renderer, buttonFont, "MOVEMENT", 205, greeny_green);
+  drawText(renderer, buttonFont, "WASD / Arrow Keys - Move", 240, textColor);
+
+  drawText(renderer, buttonFont, "INTERACTION", 285, greeny_green);
+
+  drawText(renderer, buttonFont, "E - Gather resources and interact", 320,
+
+           textColor);
+
+  drawText(renderer, buttonFont, "I - Open / close inventory", 355, textColor);
+  drawText(renderer, buttonFont, "COMBAT", 400, greeny_green);
+
+  drawText(renderer, buttonFont, "SPACE - Melee Attack", 435, textColor);
+  drawText(renderer, buttonFont, "P - Equip / unequip moonfire sigil (gun)",
+           470, textColor);
+
+  // back btn
+
+  const SDL_Rect backBtn{360, 535, 240, 48};
+
+  SDL_SetRenderDrawColor(renderer, hoveredTutorialBlack == 0 ? 63 : 35,
+                         hoveredTutorialBlack == 0 ? 79 : 48,
+                         hoveredTutorialBlack == 0 ? 57 : 40, 255);
+
+  SDL_RenderFillRect(renderer, const_cast<SDL_Rect *>(&backBtn));
+
+  SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
+
+  SDL_RenderDrawRect(renderer, const_cast<SDL_Rect *>(&backBtn));
+
+  drawText(renderer, buttonFont, "Back to main menu", 548,
+           hoveredTutorialBlack == 0 ? parchment : greeny_green);
+
+  SDL_RenderPresent(renderer);
 }

@@ -22,6 +22,7 @@ public:
   //
 
   bool takeNewGameRequest();
+  void drawTutorial(SDL_Renderer *renderer);
   bool takeContinueRequest();
 
 private:
@@ -42,7 +43,7 @@ private:
   Button buttons[4] = {
       {{360, 290, 240, 48}, "New Game"},
       {{360, 350, 240, 48}, "Continue"},
-      {{360, 410, 240, 48}, "Settings"},
+      {{360, 410, 240, 48}, "How To Play"},
       {{360, 470, 240, 48}, "Quit"},
   };
 
@@ -54,6 +55,9 @@ private:
 
   bool newGameRequested = false;
   bool continueRequested = false;
+
+  bool howToPlayOpen = false;
+  int hoveredTutorialBlack = -1;
 };
 
 // ARE ALL OF US RIDING TO OUR DEATHS!? YES, WE ARE!!! MY SOLIDERS SCREAM, MY
