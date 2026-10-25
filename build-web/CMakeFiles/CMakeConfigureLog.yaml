@@ -1,0 +1,954 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/uname"
+      - "/home/armaan025/.emsdk/upstream/emscripten/uname"
+      - "/home/armaan025/.opencode/bin/uname"
+      - "/home/armaan025/.local/bin/uname"
+      - "/usr/local/sbin/uname"
+      - "/usr/local/bin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:213 (message)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      The target system is: Emscripten - 1 - x86
+      The host system is: Linux - 7.2.11-arch1-1 - x86_64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeNinjaFindMake.cmake:5 (find_program)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_MAKE_PROGRAM"
+    description: "Program used to build from build.ninja files."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ninja-build"
+      - "ninja"
+      - "samu"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/ninja-build"
+      - "/home/armaan025/.emsdk/ninja"
+      - "/home/armaan025/.emsdk/samu"
+      - "/home/armaan025/.emsdk/upstream/emscripten/ninja-build"
+      - "/home/armaan025/.emsdk/upstream/emscripten/ninja"
+      - "/home/armaan025/.emsdk/upstream/emscripten/samu"
+      - "/home/armaan025/.opencode/bin/ninja-build"
+      - "/home/armaan025/.opencode/bin/ninja"
+      - "/home/armaan025/.opencode/bin/samu"
+      - "/home/armaan025/.local/bin/ninja-build"
+      - "/home/armaan025/.local/bin/ninja"
+      - "/home/armaan025/.local/bin/samu"
+      - "/usr/local/sbin/ninja-build"
+      - "/usr/local/sbin/ninja"
+      - "/usr/local/sbin/samu"
+      - "/usr/local/bin/ninja-build"
+      - "/usr/local/bin/ninja"
+      - "/usr/local/bin/samu"
+      - "/usr/bin/ninja-build"
+    found: "/usr/bin/ninja"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_STRIP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "llvm-strip"
+      - "strip"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/llvm-strip"
+      - "/home/armaan025/.emsdk/llvm-strip"
+      - "/home/armaan025/.opencode/bin/llvm-strip"
+      - "/home/armaan025/.local/bin/llvm-strip"
+      - "/usr/local/sbin/llvm-strip"
+      - "/usr/local/bin/llvm-strip"
+      - "/usr/bin/llvm-strip"
+      - "/usr/lib/jvm/default/bin/llvm-strip"
+      - "/usr/bin/site_perl/llvm-strip"
+      - "/usr/bin/vendor_perl/llvm-strip"
+      - "/usr/bin/core_perl/llvm-strip"
+      - "/bin/llvm-strip"
+      - "/sbin/llvm-strip"
+      - "/home/armaan025/.emsdk/upstream/emscripten/strip"
+      - "/home/armaan025/.emsdk/strip"
+      - "/home/armaan025/.opencode/bin/strip"
+      - "/home/armaan025/.local/bin/strip"
+      - "/usr/local/sbin/strip"
+      - "/usr/local/bin/strip"
+    found: "/usr/bin/strip"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ld.lld"
+      - "ld"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/ld.lld"
+      - "/home/armaan025/.emsdk/ld.lld"
+      - "/home/armaan025/.opencode/bin/ld.lld"
+      - "/home/armaan025/.local/bin/ld.lld"
+      - "/usr/local/sbin/ld.lld"
+      - "/usr/local/bin/ld.lld"
+    found: "/usr/bin/ld.lld"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJDUMP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "llvm-objdump"
+      - "objdump"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/llvm-objdump"
+      - "/home/armaan025/.emsdk/llvm-objdump"
+      - "/home/armaan025/.opencode/bin/llvm-objdump"
+      - "/home/armaan025/.local/bin/llvm-objdump"
+      - "/usr/local/sbin/llvm-objdump"
+      - "/usr/local/bin/llvm-objdump"
+      - "/usr/bin/llvm-objdump"
+      - "/usr/lib/jvm/default/bin/llvm-objdump"
+      - "/usr/bin/site_perl/llvm-objdump"
+      - "/usr/bin/vendor_perl/llvm-objdump"
+      - "/usr/bin/core_perl/llvm-objdump"
+      - "/bin/llvm-objdump"
+      - "/sbin/llvm-objdump"
+      - "/home/armaan025/.emsdk/upstream/emscripten/objdump"
+      - "/home/armaan025/.emsdk/objdump"
+      - "/home/armaan025/.opencode/bin/objdump"
+      - "/home/armaan025/.local/bin/objdump"
+      - "/usr/local/sbin/objdump"
+      - "/usr/local/bin/objdump"
+    found: "/usr/bin/objdump"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJCOPY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "llvm-objcopy"
+      - "objcopy"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/llvm-objcopy"
+      - "/home/armaan025/.emsdk/llvm-objcopy"
+      - "/home/armaan025/.opencode/bin/llvm-objcopy"
+      - "/home/armaan025/.local/bin/llvm-objcopy"
+      - "/usr/local/sbin/llvm-objcopy"
+      - "/usr/local/bin/llvm-objcopy"
+      - "/usr/bin/llvm-objcopy"
+      - "/usr/lib/jvm/default/bin/llvm-objcopy"
+      - "/usr/bin/site_perl/llvm-objcopy"
+      - "/usr/bin/vendor_perl/llvm-objcopy"
+      - "/usr/bin/core_perl/llvm-objcopy"
+      - "/bin/llvm-objcopy"
+      - "/sbin/llvm-objcopy"
+      - "/home/armaan025/.emsdk/upstream/emscripten/objcopy"
+      - "/home/armaan025/.emsdk/objcopy"
+      - "/home/armaan025/.opencode/bin/objcopy"
+      - "/home/armaan025/.local/bin/objcopy"
+      - "/usr/local/sbin/objcopy"
+      - "/usr/local/bin/objcopy"
+    found: "/usr/bin/objcopy"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_READELF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "llvm-readelf"
+      - "readelf"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/llvm-readelf"
+      - "/home/armaan025/.emsdk/llvm-readelf"
+      - "/home/armaan025/.opencode/bin/llvm-readelf"
+      - "/home/armaan025/.local/bin/llvm-readelf"
+      - "/usr/local/sbin/llvm-readelf"
+      - "/usr/local/bin/llvm-readelf"
+      - "/usr/bin/llvm-readelf"
+      - "/usr/lib/jvm/default/bin/llvm-readelf"
+      - "/usr/bin/site_perl/llvm-readelf"
+      - "/usr/bin/vendor_perl/llvm-readelf"
+      - "/usr/bin/core_perl/llvm-readelf"
+      - "/bin/llvm-readelf"
+      - "/sbin/llvm-readelf"
+      - "/home/armaan025/.emsdk/upstream/emscripten/readelf"
+      - "/home/armaan025/.emsdk/readelf"
+      - "/home/armaan025/.opencode/bin/readelf"
+      - "/home/armaan025/.local/bin/readelf"
+      - "/usr/local/sbin/readelf"
+      - "/usr/local/bin/readelf"
+    found: "/usr/bin/readelf"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_DLLTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "llvm-dlltool"
+      - "dlltool"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/llvm-dlltool"
+      - "/home/armaan025/.emsdk/llvm-dlltool"
+      - "/home/armaan025/.opencode/bin/llvm-dlltool"
+      - "/home/armaan025/.local/bin/llvm-dlltool"
+      - "/usr/local/sbin/llvm-dlltool"
+      - "/usr/local/bin/llvm-dlltool"
+      - "/usr/bin/llvm-dlltool"
+      - "/usr/lib/jvm/default/bin/llvm-dlltool"
+      - "/usr/bin/site_perl/llvm-dlltool"
+      - "/usr/bin/vendor_perl/llvm-dlltool"
+      - "/usr/bin/core_perl/llvm-dlltool"
+      - "/bin/llvm-dlltool"
+      - "/sbin/llvm-dlltool"
+      - "/home/armaan025/.emsdk/upstream/emscripten/dlltool"
+      - "/home/armaan025/.emsdk/dlltool"
+      - "/home/armaan025/.opencode/bin/dlltool"
+      - "/home/armaan025/.local/bin/dlltool"
+      - "/usr/local/sbin/dlltool"
+      - "/usr/local/bin/dlltool"
+      - "/usr/bin/dlltool"
+      - "/usr/lib/jvm/default/bin/dlltool"
+      - "/usr/bin/site_perl/dlltool"
+      - "/usr/bin/vendor_perl/dlltool"
+      - "/usr/bin/core_perl/dlltool"
+      - "/bin/dlltool"
+      - "/sbin/dlltool"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_ADDR2LINE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "llvm-addr2line"
+      - "addr2line"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/llvm-addr2line"
+      - "/home/armaan025/.emsdk/llvm-addr2line"
+      - "/home/armaan025/.opencode/bin/llvm-addr2line"
+      - "/home/armaan025/.local/bin/llvm-addr2line"
+      - "/usr/local/sbin/llvm-addr2line"
+      - "/usr/local/bin/llvm-addr2line"
+      - "/usr/bin/llvm-addr2line"
+      - "/usr/lib/jvm/default/bin/llvm-addr2line"
+      - "/usr/bin/site_perl/llvm-addr2line"
+      - "/usr/bin/vendor_perl/llvm-addr2line"
+      - "/usr/bin/core_perl/llvm-addr2line"
+      - "/bin/llvm-addr2line"
+      - "/sbin/llvm-addr2line"
+      - "/home/armaan025/.emsdk/upstream/emscripten/addr2line"
+      - "/home/armaan025/.emsdk/addr2line"
+      - "/home/armaan025/.opencode/bin/addr2line"
+      - "/home/armaan025/.local/bin/addr2line"
+      - "/usr/local/sbin/addr2line"
+      - "/usr/local/bin/addr2line"
+    found: "/usr/bin/addr2line"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:247 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_TAPI"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "tapi"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/"
+      - "/home/armaan025/.emsdk/"
+      - "/home/armaan025/.opencode/bin/"
+      - "/home/armaan025/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/usr/lib/jvm/default/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/bin/"
+      - "/sbin/"
+    searched_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/tapi"
+      - "/home/armaan025/.emsdk/tapi"
+      - "/home/armaan025/.opencode/bin/tapi"
+      - "/home/armaan025/.local/bin/tapi"
+      - "/usr/local/sbin/tapi"
+      - "/usr/local/bin/tapi"
+      - "/usr/bin/tapi"
+      - "/usr/lib/jvm/default/bin/tapi"
+      - "/usr/bin/site_perl/tapi"
+      - "/usr/bin/vendor_perl/tapi"
+      - "/usr/bin/core_perl/tapi"
+      - "/bin/tapi"
+      - "/sbin/tapi"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Platform/Emscripten.cmake:6 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "_EMSCRIPTEN_PLATFORM_MODULE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "Platform/Emscripten.cmake"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/"
+    found: "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot;/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Platform/Emscripten.cmake:6 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "_EMSCRIPTEN_PLATFORM_MODULE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "Platform/Emscripten.cmake"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/"
+    found: "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Platform/Emscripten.cmake:6 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "_EMSCRIPTEN_PLATFORM_MODULE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "Platform/Emscripten.cmake"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/"
+    found: "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Platform/Emscripten.cmake:6 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "_EMSCRIPTEN_PLATFORM_MODULE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "Platform/Emscripten.cmake"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/"
+    found: "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Platform/Emscripten.cmake:6 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "_EMSCRIPTEN_PLATFORM_MODULE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "Platform/Emscripten.cmake"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/"
+    found: "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Platform/Emscripten.cmake:6 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "_EMSCRIPTEN_PLATFORM_MODULE"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "Platform/Emscripten.cmake"
+    candidate_directories:
+      - "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/"
+    found: "/home/armaan025/.emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/armaan025/.emsdk"
+        - "/home/armaan025/.emsdk/upstream/emscripten"
+        - "/home/armaan025/.opencode/bin"
+        - "/home/armaan025/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/lib/jvm/default/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+      CMAKE_INSTALL_PREFIX: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/"
+      CMAKE_FIND_ROOT_PATH: "/home/armaan025/.emsdk/upstream/emscripten/cache/sysroot"
+...

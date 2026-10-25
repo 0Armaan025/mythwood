@@ -1,0 +1,21 @@
+[[headers]]
+  for = "*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+    Content-Encoding = "identity"
+
+[[headers]]
+  for = "*.data"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "index.html"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+    Cache-Control = "no-cache"

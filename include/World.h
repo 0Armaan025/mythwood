@@ -124,7 +124,7 @@ private:
 
   float rocketCooldown = 0.0f;
 
-  static constexpr int ROCKET_LAUNCHER_PRICE = 5;
+  static constexpr int ROCKET_LAUNCHER_PRICE = 75;
   static constexpr int STARTING_ROCKET_AMMO = 8;
   static constexpr float ROCKET_FIRE_INTERVAL = 0.65f;
   bool launcherEnding = false;
