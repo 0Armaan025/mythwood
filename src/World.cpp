@@ -50,10 +50,17 @@ World::~World() {
 }
 
 bool World::init() {
+#ifdef __EMSCRIPTEN__
+  font = TTF_OpenFont("DejaVuSerif.ttf", 18);
+
+  endingFont = TTF_OpenFont("DejaVuSerif.ttf", 64);
+  subtitleFont = TTF_OpenFont("DejaVuSerif.ttf", 22);
+#else
   font = TTF_OpenFont("assets/DejaVuSerif.ttf", 18);
 
   endingFont = TTF_OpenFont("assets/DejaVuSerif.ttf", 64);
   subtitleFont = TTF_OpenFont("assets/DejaVuSerif.ttf", 22);
+#endif
 
   if (!font || !endingFont || !subtitleFont) {
     cout << "error: " << TTF_GetError() << endl;
