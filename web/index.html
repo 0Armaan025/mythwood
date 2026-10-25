@@ -41,8 +41,6 @@
 <div id="status">Loading Mythwood&hellip;</div>
 
 <script>
-// Hook into emscripten's Module before mythwood.js runs so the renderer
-// attaches to this canvas instead of searching for one.
 var Module = {
   canvas: document.getElementById('canvas'),
 
