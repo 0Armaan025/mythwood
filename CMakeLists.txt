@@ -22,12 +22,12 @@ target_include_directories(mythwood PRIVATE include)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_TOOLCHAIN_FILE MATCHES "Emscripten")
   # Emscripten: SDL2/SDL2_ttf come from emscripten ports via -sUSE_SDL flags.
-  # Font is embedded directly into the JS output (no .data sidecar).
+  # Font is preloaded into the virtual fs at root path (DejaVuSerif.ttf).
   # ALLOW_MEMORY_GROWTH lets the heap expand past the default 16 MB cap.
   target_compile_options(mythwood PRIVATE -sUSE_SDL=2 -sUSE_SDL_TTF=2)
   target_link_libraries(mythwood PRIVATE -sUSE_SDL=2 -sUSE_SDL_TTF=2)
   target_link_options(mythwood PRIVATE
-    --embed-file ${CMAKE_SOURCE_DIR}/assets
+    --preload-file ${CMAKE_SOURCE_DIR}/assets/DejaVuSerif.ttf@DejaVuSerif.ttf
     -sALLOW_MEMORY_GROWTH=1
     -sINITIAL_MEMORY=33554432
   )
