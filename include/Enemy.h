@@ -19,6 +19,7 @@ public:
 
   void applyKnockback(float originX, float originY, float force);
   int getHealth() const;
+  SDL_Color getColor() const;
 
 private:
   float x;

@@ -122,7 +122,7 @@ void World::start() {
                                      {140, 160, 100, 80},
                                      {300, 160, 54, 58}};
 
-  constexpr int SLIME_COUNT = 15;
+  constexpr int SLIME_COUNT = 130;
 
   for (int i = 0; i < SLIME_COUNT; ++i) {
     bool placed = false;
@@ -1211,6 +1211,90 @@ void World::render(SDL_Renderer *renderer) const {
                 (launcherEquipped ? " [EQUIPPED] " : " [R to equip] ");
 
   drawText(renderer, launcherStatus, 440, 42, {255, 170, 95, 255});
+
+  // mINIMAPAPAPAP
+
+  constexpr int MAP_X = 790;
+  constexpr int MAP_Y = 78;
+  constexpr int MAP_W = 150;
+  constexpr int MAP_H = 120;
+
+  constexpr float MAP_SCALE = 0.35f;
+
+  const SDL_Rect mapPanel{MAP_X, MAP_Y, MAP_W, MAP_H};
+
+  // panel bg
+
+  SDL_SetRenderDrawColor(renderer, 18, 30, 24, 235);
+  SDL_RenderFillRect(renderer, &mapPanel);
+
+  // border
+
+  SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
+  SDL_RenderDrawRect(renderer, &mapPanel);
+
+  // grid
+
+  SDL_SetRenderDrawColor(renderer, 48, 66, 52, 255);
+  SDL_RenderDrawLine(renderer, MAP_X + MAP_W / 2, MAP_Y + 5, MAP_X + MAP_W / 2,
+                     MAP_Y + MAP_H - 5);
+  SDL_RenderDrawLine(renderer, MAP_X + 5, MAP_Y + MAP_H / 2, MAP_Y + MAP_H - 5,
+                     MAP_Y + MAP_H / 2);
+
+  const SDL_Rect playerBounds = player.getBounds();
+
+  const float playerCenterX = playerBounds.w + playerBounds.w / 2.0f;
+  const float playerCenterY = playerBounds.y + playerBounds.h / 2.0f;
+
+  const int mapCenterX = MAP_X + MAP_W / 2;
+  const int mapCenterY = MAP_Y + MAP_H / 2;
+  // living slimes
+
+  for (const auto &enemy : enemies) {
+    if (!enemy.isAlive()) {
+      continue;
+    }
+
+    const SDL_Rect slime = enemy.getBounds();
+
+    const float slimeCenterX = slime.x + slime.w / 2.0f;
+    const float slimeCenterY = slime.y + slime.h / 2.0f;
+
+    const int dotX =
+        mapCenterX +
+        static_cast<int>((slimeCenterX - playerCenterX) * MAP_SCALE);
+    const int dotY =
+        mapCenterY +
+        static_cast<int>((slimeCenterY - playerCenterY) * MAP_SCALE);
+
+    if (dotX < MAP_X + 4 || dotX > MAP_X + MAP_W - 4 || dotY < MAP_Y + 4 ||
+        dotY > MAP_Y + MAP_H - 4) {
+      continue;
+    }
+
+    const SDL_Color slimeColor = enemy.getColor();
+
+    SDL_SetRenderDrawColor(renderer, slimeColor.r, slimeColor.g, slimeColor.b,
+                           255);
+
+    const SDL_Rect dot{dotX - 2, dotY - 2, 5, 5};
+    SDL_RenderFillRect(renderer, &dot);
+  }
+
+  SDL_SetRenderDrawColor(renderer, 245, 235, 195, 255);
+
+  const SDL_Rect playerDot{mapCenterX - 3, mapCenterY - 3, 7, 7};
+  SDL_RenderFillRect(renderer, &playerDot);
+
+  SDL_RenderDrawLine(renderer, mapCenterX - 5, mapCenterY, mapCenterX + 5,
+                     mapCenterY);
+
+  SDL_RenderDrawLine(renderer, mapCenterX, mapCenterY - 5, mapCenterX,
+                     mapCenterY + 5);
+
+  // label
+
+  drawText(renderer, "MINIMAP", MAP_X + 5, MAP_Y + 4, {220, 204, 158, 255});
 
   if (nearbyStructure) {
     const std::string prompt = "E - Interact: " + nearbyStructure->getName();

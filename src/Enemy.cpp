@@ -149,3 +149,5 @@ void Enemy::applyKnockback(float originX, float originY, float force) {
   knockbackVX += (dx / distance) * force;
   knockbackVY += (dy / distance) * force;
 }
+
+SDL_Color Enemy::getColor() const { return color; }
