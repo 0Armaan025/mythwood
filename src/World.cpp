@@ -131,6 +131,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   if (shopOpen) {
     if (eDown && !previousE) {
       shopOpen = false;
+      previousE = true;
       message = "Come back anytime.";
     }
 
@@ -159,23 +160,6 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
       }
     }
 
-    if (!shopOpen && usePotionDown && !previousUsePotion) {
-      if (playerHealth >= MAX_PLAYER_HEALTH) {
-        message = "Your health is already full.";
-
-      } else if (inventory.removeItem("health_potion", 1)) {
-        playerHealth =
-            std::min(MAX_PLAYER_HEALTH, playerHealth + POTION_HEAL_AMOUNT);
-
-        message = "Health restored!";
-      } else {
-        message = "You don't have a Health Potion.";
-      }
-    }
-
-    previousBuyPotion = buyPotionDown;
-    previousUsePotion = usePotionDown;
-
     if (buyPotionDown && !previousBuyPotion) {
       if (coins < POTION_PRICE) {
         message = "Not enough coins! you need 15.";
@@ -192,6 +176,27 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
       }
     }
   }
+
+  if (!shopOpen && iDown && !previousI) {
+    inventoryOpen = !inventoryOpen;
+  }
+
+  if (!shopOpen && usePotionDown && !previousUsePotion) {
+    if (playerHealth >= MAX_PLAYER_HEALTH) {
+      message = "Your health is already full.";
+
+    } else if (inventory.removeItem("health_potion", 1)) {
+      playerHealth =
+          std::min(MAX_PLAYER_HEALTH, playerHealth + POTION_HEAL_AMOUNT);
+
+      message = "Health restored!";
+    } else {
+      message = "You don't have a Health Potion.";
+    }
+  }
+
+  previousBuyPotion = buyPotionDown;
+  previousUsePotion = usePotionDown;
 
   previousShopSellWood = sellWoodDown;
   previousShopSellStone = sellStoneDown;
@@ -396,7 +401,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   const Uint8 *attackKeys = SDL_GetKeyboardState(nullptr);
   const bool attackDown = attackKeys[SDL_SCANCODE_SPACE];
 
-  if (!inventoryOpen && attackDown && !previousAttack &&
+  if (!inventoryOpen && !shopOpen && attackDown && !previousAttack &&
       attackCooldown <= 0.0f) {
     const SDL_Rect playerBounds = player.getBounds();
 
@@ -529,8 +534,8 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   int mouseY = 0;
   const Uint32 mouseButtons = SDL_GetMouseState(&mouseX, &mouseY);
 
-  if (!inventoryOpen && magicEquipped && (mouseButtons & SDL_BUTTON_LMASK) &&
-      shotCoolDown <= 0.0f) {
+  if (!inventoryOpen && !shopOpen && magicEquipped &&
+      (mouseButtons & SDL_BUTTON_LMASK) && shotCoolDown <= 0.0f) {
 
     const SDL_Rect playerBounds = player.getBounds();
     const float startX = playerBounds.x + playerBounds.w / 2.0f;
@@ -818,35 +823,34 @@ void World::render(SDL_Renderer *renderer) const {
       y += 30;
     }
 
-    if (shopOpen) {
-      SDL_SetRenderDrawColor(renderer, 20, 29, 25, 245);
-      SDL_Rect panel{260, 150, 440, 330};
-      SDL_RenderFillRect(renderer, &panel);
-
-      SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
-      SDL_RenderDrawRect(renderer, &panel);
-
-      drawText(renderer, "FOREST MERCHANT", 290, 175, {220, 204, 158, 255});
-      drawText(renderer, "Coins: " + std::to_string(coins), 290, 215,
-               {240, 204, 158, 95});
-
-      drawText(renderer, "1 - Sell all wood (3 coins each)", 290, 265,
-               {190, 199, 170, 255});
-
-      drawText(renderer, "2 - Sell all stone (2 coins each)", 290, 305,
-               {190, 199, 170, 255});
-
-      drawText(renderer, "3 - Buy Health Potion (15 coins each)", 290, 325,
-               {190, 199, 170, 255});
-
-      drawText(renderer, "H - Use a potion", 290, 360, {190, 199, 170, 255});
-      drawText(renderer, "E - Leave shop", 290, 405, {160, 174, 142, 255});
-    }
-
     if (inventory.getItems().empty())
       drawText(renderer, "Your bag is empty.", 635, 155, {160, 174, 142, 255});
 
     drawText(renderer, "Press I to close", 635, 500, {160, 174, 142, 255});
+  }
+  if (shopOpen) {
+    SDL_SetRenderDrawColor(renderer, 20, 29, 25, 245);
+    SDL_Rect panel{260, 150, 440, 330};
+    SDL_RenderFillRect(renderer, &panel);
+
+    SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
+    SDL_RenderDrawRect(renderer, &panel);
+
+    drawText(renderer, "FOREST MERCHANT", 290, 175, {220, 204, 158, 255});
+    drawText(renderer, "Coins: " + std::to_string(coins), 290, 215,
+             {240, 204, 158, 95});
+
+    drawText(renderer, "1 - Sell all wood (3 coins each)", 290, 265,
+             {190, 199, 170, 255});
+
+    drawText(renderer, "2 - Sell all stone (2 coins each)", 290, 305,
+             {190, 199, 170, 255});
+
+    drawText(renderer, "3 - Buy Health Potion (15 coins each)", 290, 325,
+             {190, 199, 170, 255});
+
+    drawText(renderer, "H - Use a potion", 290, 360, {190, 199, 170, 255});
+    drawText(renderer, "E - Leave shop", 290, 405, {160, 174, 142, 255});
   }
 
   SDL_RenderPresent(renderer);
@@ -918,17 +922,17 @@ bool World::loadGame() {
   float loadedX = 0.0f;
   float loadedY = 0.0f;
 
+  if (!(in >> loadedX >> loadedY) || !std::isfinite(loadedX) ||
+      !std::isfinite(loadedY)) {
+    return false;
+  }
+
   int loadedCoins = 0;
 
   if (version >= 2) {
     if (!(in >> loadedCoins || loadedCoins < 0)) {
       return false;
     }
-  }
-
-  if (!(in >> loadedX >> loadedY) || !std::isfinite(loadedX) ||
-      !std::isfinite(loadedY)) {
-    return false;
   }
 
   // million for now ig
