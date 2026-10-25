@@ -54,7 +54,17 @@ bool World::init() {
 void World::start() {
   enemies.clear();
 
-  enemies.emplace_back(500.0f, 420.0f);
+  const SDL_Point slimeSpawns[] = {
+      {500, 420}, {250, 350}, {350, 500}, {420, 150}, {560, 280},
+      {600, 520}, {720, 350}, {800, 450}, {900, 250}, {950, 600},
+      {150, 400}, {200, 550}, {700, 650}, {1000, 400}};
+
+  for (const SDL_Point &spawn : slimeSpawns) {
+
+    enemies.emplace_back(static_cast<float>(spawn.x),
+                         static_cast<float>(spawn.y));
+  }
+
   player.reset();
   projectiles.clear();
   magicEquipped = false;
@@ -468,7 +478,6 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     const SDL_Rect playerBounds = player.getBounds();
 
     for (auto &enemy : enemies) {
-      enemy.update(deltaTime, playerBounds);
 
       if (!enemy.isAlive() || playerDamageCoolDown > 0.0f) {
         continue;
