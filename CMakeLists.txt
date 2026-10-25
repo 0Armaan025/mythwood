@@ -31,7 +31,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   # directory so relative file paths (fonts) resolve in the browser virtual FS.
   target_compile_options(mythwood PRIVATE -sUSE_SDL=2 -sUSE_SDL_TTF=2)
   target_link_libraries(mythwood PRIVATE -sUSE_SDL=2 -sUSE_SDL_TTF=2)
-  target_link_options(mythwood PRIVATE --preload-file ${CMAKE_SOURCE_DIR}/assets)
+  target_link_options(mythwood PRIVATE --embed-file ${CMAKE_SOURCE_DIR}/assets/DejaVuSerif.ttf@assets/DejaVuSerif.ttf)
 else()
   target_link_libraries(mythwood PRIVATE SDL2::SDL2 SDL2_ttf::SDL2_ttf)
 endif()
