@@ -30,7 +30,7 @@ bool MainMenu::init() {
   }
 
   // I use arch btw (with hyprland and no dots, custom customization lol)
-  const char *fontPath = "/usr/share/fonts/TTF/DejaVuSerif.ttf";
+  const char *fontPath = "assets/DejaVuSerif.ttf";
   titleFont = TTF_OpenFont(fontPath, 64);
   buttonFont = TTF_OpenFont(fontPath, 22);
   if (!titleFont || !buttonFont) {

@@ -1,4 +1,3 @@
-
 #include "../include/Game.h"
 #include <SDL2/SDL_timer.h>
 
@@ -15,46 +14,67 @@ bool Game::init() {
   return true;
 }
 
-void Game::run() {
-  Uint64 previous = SDL_GetPerformanceCounter();
-  while (window.isRunning()) {
-    Uint64 current = SDL_GetPerformanceCounter();
+bool Game::runFrame() {
+  Uint64 current = SDL_GetPerformanceCounter();
 
-    // tired
-    float deltaTime =
-        static_cast<float>(static_cast<double>(current - previous) /
-                           SDL_GetPerformanceFrequency());
+  float deltaTime =
+      static_cast<float>(static_cast<double>(current - previousCounter) /
+                         SDL_GetPerformanceFrequency());
 
-    previous = current;
+  previousCounter = current;
 
-    if (deltaTime > 0.05f)
-      deltaTime = 0.05f;
-    window.pollEvents();
+  if (deltaTime > 0.05f)
+    deltaTime = 0.05f;
 
-    if (!playing) {
-      if (!mainMenu.update())
-        break;
+  window.pollEvents();
 
-      if (mainMenu.takeNewGameRequest()) {
-        world.start();
+  if (!window.isRunning())
+    return false;
+
+  if (!playing) {
+    if (!mainMenu.update())
+      return false;
+
+    if (mainMenu.takeNewGameRequest()) {
+      world.start();
+      playing = true;
+    }
+
+    if (mainMenu.takeContinueRequest()) {
+      if (world.loadGame()) {
         playing = true;
       }
+    }
 
-      if (mainMenu.takeContinueRequest()) {
-        if (world.loadGame()) {
-          playing = true;
-        }
-      }
+    mainMenu.render(window.getRenderer());
+  } else {
+    world.update(deltaTime, window.getRenderer());
 
-      mainMenu.render(window.getRenderer());
+    if (world.shouldReturnToMenu()) {
+      playing = false;
     } else {
-      world.update(deltaTime, window.getRenderer());
-
-      if (world.shouldReturnToMenu()) {
-        playing = false;
-      } else {
-        world.render(window.getRenderer());
-      }
+      world.render(window.getRenderer());
     }
   }
+
+  return true;
 }
+
+void Game::run() {
+  previousCounter = SDL_GetPerformanceCounter();
+
+#ifdef __EMSCRIPTEN__
+  emscripten_set_main_loop_arg(mainLoopCallback, this, 0, 1);
+#else
+  while (window.isRunning() && runFrame())
+    ;
+#endif
+}
+
+#ifdef __EMSCRIPTEN__
+void Game::mainLoopCallback(void *arg) {
+  if (!static_cast<Game *>(arg)->runFrame()) {
+    emscripten_cancel_main_loop();
+  }
+}
+#endif
