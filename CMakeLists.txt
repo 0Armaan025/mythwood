@@ -19,6 +19,7 @@ add_executable(mythwood
   src/Structure.cpp
   src/Projectile.cpp
   src/Enemy.cpp
+  src/Rocket.cpp
 )
 
 target_include_directories(mythwood PRIVATE include)

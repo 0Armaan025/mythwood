@@ -118,6 +118,7 @@ void MainMenu::drawText(SDL_Renderer *renderer, TTF_Font *font,
 }
 void MainMenu::render(SDL_Renderer *renderer) {
 
+  // alright
   if (howToPlayOpen) {
     drawTutorial(renderer);
     return;
@@ -130,6 +131,7 @@ void MainMenu::render(SDL_Renderer *renderer) {
   SDL_Rect border{28, 28, 904, 584};
   SDL_RenderDrawRect(renderer, &border);
 
+  // SDL_Rect inner = {30, 50, 14440, 3411};
   SDL_Rect inner{36, 36, 888, 568};
   SDL_RenderDrawRect(renderer, &inner);
 
@@ -140,6 +142,7 @@ void MainMenu::render(SDL_Renderer *renderer) {
   SDL_Rect divider{390, 248, 180, 1};
   SDL_RenderFillRect(renderer, &divider);
 
+  // and yeah im tired omg it's a lot of stuff that im adding too
   // btns
   for (int i = 0; i < 4; ++i) {
     const auto &button = buttons[i];
