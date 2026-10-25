@@ -17,6 +17,7 @@ public:
   SDL_Rect getBounds() const;
   bool isAlive() const;
 
+  void applyKnockback(float originX, float originY, float force);
   int getHealth() const;
 
 private:
@@ -32,4 +33,7 @@ private:
   float moveSpeed = 75.0f;
   static constexpr float AGGRO_RANGE = 220.0f;
   static constexpr float STOP_DISTANCE = 30.0f;
+
+  float knockbackVX = 0.0f;
+  float knockbackVY = 0.0f;
 };

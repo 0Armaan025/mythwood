@@ -1,4 +1,5 @@
 #include "../include/World.h"
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
@@ -69,6 +70,14 @@ void World::start() {
   projectiles.clear();
   magicEquipped = false;
   previousP = false;
+  rockets.clear();
+  hasRocketLauncher = false;
+  launcherEquipped = false;
+  rocketAmmo = 0;
+
+  previousBuyLauncher = false;
+  previousLauncherToggle = false;
+  rocketCooldown = 0.0f;
   shotCoolDown = 0.0f;
   inventory = Inventory{};
   structures.clear();
@@ -135,6 +144,8 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   const bool sellWoodDown = keys[SDL_SCANCODE_1];
   const bool sellStoneDown = keys[SDL_SCANCODE_2];
   const bool buyPotionDown = keys[SDL_SCANCODE_3];
+  const bool buyLauncherDown = keys[SDL_SCANCODE_4];
+  const bool launcherToggleDown = keys[SDL_SCANCODE_R];
 
   const bool usePotionDown = keys[SDL_SCANCODE_H];
 
@@ -187,6 +198,22 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     }
   }
 
+  if (buyLauncherDown && !previousBuyLauncher) {
+    if (hasRocketLauncher) {
+      message = "You already own the Chaos Launcher!";
+    } else if (coins < ROCKET_LAUNCHER_PRICE) {
+      message = "You need 75 coins for the Chaos Launcher.";
+    } else {
+      coins -= ROCKET_LAUNCHER_PRICE;
+
+      hasRocketLauncher = true;
+      launcherEquipped = true;
+      rocketAmmo = STARTING_ROCKET_AMMO;
+
+      message = "CHAOS LAUNCHER acquired! Press R to equip!";
+    }
+  }
+
   if (!shopOpen && iDown && !previousI) {
     inventoryOpen = !inventoryOpen;
   }
@@ -211,10 +238,23 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   previousShopSellWood = sellWoodDown;
   previousShopSellStone = sellStoneDown;
 
-  if (iDown && !previousI)
-    inventoryOpen = !inventoryOpen;
+  if (!shopOpen && !inventoryOpen && launcherToggleDown &&
+      !previousLauncherToggle) {
+    if (!hasRocketLauncher) {
+      message = "Find a merchant to buy the Chaos Launcher.";
+    }
 
-  // OUR GUN STUFF
+    else {
+      launcherEquipped = !launcherEquipped;
+
+      message = launcherEquipped
+                    ? "CHAOS Launcher Equipped!"
+                    : "Chaos Launcher holstered. Use P for Moonfire.";
+    }
+  }
+
+  previousBuyLauncher = buyLauncherDown;
+  previousLauncherToggle = launcherToggleDown;
 
   if (pDown && !previousP) {
     if (magicEquipped) {
@@ -404,6 +444,8 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
 
   shotCoolDown = shotCoolDown - deltaTime;
 
+  rocketCooldown = std::max(0.0f, rocketCooldown - deltaTime);
+
   attackCooldown = std::max(0.0f, attackCooldown - deltaTime);
 
   attackAnimationTimer = std::max(0.0f, attackAnimationTimer - deltaTime);
@@ -528,6 +570,80 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
       }
     }
 
+    for (auto &rocket : rockets) {
+      rocket.update(deltaTime);
+
+      if (rocket.isFlying()) {
+        const SDL_Rect rocketBounds = rocket.getBounds();
+
+        for (const auto &enemy : enemies) {
+          if (!enemy.isAlive()) {
+            continue;
+          }
+
+          const SDL_Rect enemyBounds = enemy.getBounds();
+
+          if (SDL_HasIntersection(&rocketBounds, &enemyBounds)) {
+            rocket.beginExplosion();
+            break;
+          }
+        }
+        if (rocket.isFlying()) {
+          for (const auto &structure : structures) {
+
+            const SDL_Rect structureBounds = structure.getBounds();
+
+            if (SDL_HasIntersection(&rocketBounds, &structureBounds)) {
+              // im tireeeeeeedddddddddd audashfalsdjfdlasjl
+
+              rocket.beginExplosion();
+              break;
+            }
+          }
+        }
+      }
+
+      if (!rocket.consumeBlast()) {
+        continue;
+      }
+
+      const float blastX = rocket.getCenterX();
+      const float blastY = rocket.getCenterY();
+
+      for (auto &enemy : enemies) {
+        if (!enemy.isAlive()) {
+          continue;
+        }
+
+        const SDL_Rect bounds = enemy.getBounds();
+
+        const float enemyX = bounds.x + bounds.w / 2.0f;
+        const float enemyY = bounds.y + bounds.h / 2.0f;
+
+        const float dx = enemyX - blastX;
+        const float dy = enemyY - blastY;
+        const float distance = std::sqrt(dx * dx + dy * dy);
+
+        if (distance > Rocket::BLAST_RADIUS) {
+          continue;
+        }
+
+        enemy.takeDamage(Rocket::BLAST_DAMAGE);
+
+        const float strength =
+            Rocket::KNOCKBACK_FORCE * (1.0f - distance / Rocket::BLAST_RADIUS);
+
+        if (strength > 0.0f) {
+          enemy.applyKnockback(blastX, blastY, strength);
+        }
+      }
+    }
+
+    rockets.erase(
+        std::remove_if(rockets.begin(), rockets.end(),
+                       [](const Rocket &rocket) { return !rocket.isAlive(); }),
+        rockets.end());
+
     for (const auto &structure : structures) {
       const SDL_Rect structureBounds = structure.getBounds();
 
@@ -566,6 +682,26 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   // FOR INFINITE GEN SAKE
 
   const SDL_Rect playerBounds = player.getBounds();
+
+  if (!inventoryOpen && !shopOpen && launcherEquipped &&
+      (mouseButtons && SDL_BUTTON_LMASK) && rocketCooldown <= 0.0f) {
+  }
+
+  if (rocketAmmo <= 0) {
+    launcherEquipped = false;
+    message = "Out of rockets! Launcher holstered.";
+  } else {
+    const SDL_Rect playerBounds = player.getBounds();
+
+    const float startX = playerBounds.x + playerBounds.w / 2.0f;
+    const float startY = playerBounds.y + playerBounds.h / 2.0f;
+
+    rockets.emplace_back(startX, startY, static_cast<float>(mouseX) + cameraX,
+                         static_cast<float>(mouseY) + cameraY);
+
+    --rocketAmmo;
+    rocketCooldown = ROCKET_FIRE_INTERVAL;
+  }
 
   cameraX = playerBounds.x + playerBounds.w / 2.0f - 960.0f / 2.0f;
   cameraY = playerBounds.y + playerBounds.h / 2.0f - 640.0f / 2.0f;
@@ -751,12 +887,66 @@ void World::render(SDL_Renderer *renderer) const {
     SDL_RenderFillRect(renderer, &crystal);
   }
 
+  if (launcherEquipped) {
+    int mouseX = 0;
+    int mouseY = 0;
+    SDL_GetMouseState(&mouseX, &mouseY);
+
+    const SDL_Rect playerBounds = player.getBounds();
+
+    const float cx = playerBounds.x - cameraX + playerBounds.w / 2.0f;
+    const float cy = playerBounds.y - cameraY + playerBounds.h / 2.0f;
+
+    const float angle = std::atan2(static_cast<float>(mouseY) - cy,
+                                   static_cast<float>(mouseX) - cx);
+
+    const float handX = cx + std::cos(angle) * 8.0f;
+    const float handY = cy + std::sin(angle) * 8.0f;
+    const float tipX = cx + std::cos(angle) * 23.0f;
+    const float tipY = cy + std::sin(angle) * 23.0f;
+    // barrele
+    //
+
+    const float perpX = -std::sin(angle) * 3.0f;
+    const float perpY = std::cos(angle) * 3.0f;
+
+    SDL_SetRenderDrawColor(renderer, 65, 43, 35, 255);
+
+    SDL_RenderDrawLine(renderer, static_cast<int>(handX + perpX),
+                       static_cast<int>(handY + perpY),
+                       static_cast<int>(tipX + perpX),
+                       static_cast<int>(tipY + perpY));
+
+    SDL_RenderDrawLine(renderer, static_cast<int>(handX - perpX),
+                       static_cast<int>(handY - perpY),
+                       static_cast<int>(tipX - perpX),
+                       static_cast<int>(tipY - perpY));
+
+    SDL_SetRenderDrawColor(renderer, 255, 125, 35, 255);
+
+    SDL_RenderDrawLine(renderer, static_cast<int>(handX),
+                       static_cast<int>(handY), static_cast<int>(tipX),
+                       static_cast<int>(tipY));
+
+    SDL_Rect muzzle{static_cast<int>(tipX) - 3, static_cast<int>(tipY) - 3, 6,
+                    6};
+
+    SDL_SetRenderDrawColor(renderer, 55, 220, 115, 255);
+    // uh im boreeed
+
+    SDL_RenderFillRect(renderer, &muzzle);
+  }
+
   for (const auto &projectile : projectiles) {
     projectile.render(renderer, cameraX, cameraY);
   }
 
   for (const auto &enemy : enemies) {
     enemy.render(renderer, cameraX, cameraY);
+  }
+
+  for (const auto &rocket : rockets) {
+    rocket.render(renderer, cameraX, cameraY);
   }
 
   // Top HUD
@@ -800,11 +990,20 @@ void World::render(SDL_Renderer *renderer) const {
   SDL_Rect messagePanel{20, 570, 500, 48};
   SDL_RenderFillRect(renderer, &messagePanel);
 
-  drawText(renderer, "E: Interact   I: Inventory   P: Equip Sigil", 440, 22,
-           {160, 174, 142, 255});
+  drawText(renderer, "E: Interact   I: Inventory   P: Sigil   R: Launcher", 440,
+           22, {160, 174, 142, 255});
   drawText(renderer,
            magicEquipped ? "Moonfire: EQUIPPED" : "Moonfire: Unequipped", 24,
            42, {190, 199, 170, 255});
+
+  const std::string launcherStatus =
+      !hasRocketLauncher
+          ? "Launcher: not owned"
+          : "Launcher: " + std::to_string(rocketAmmo) +
+                (launcherEquipped ? " [EQUIPPED] " : " [R to equip] ");
+
+  drawText(renderer, launcherStatus, 440, 42, {255, 170, 95, 255});
+
   if (nearbyStructure) {
     const std::string prompt = "E - Interact: " + nearbyStructure->getName();
 
@@ -839,7 +1038,7 @@ void World::render(SDL_Renderer *renderer) const {
   }
   if (shopOpen) {
     SDL_SetRenderDrawColor(renderer, 20, 29, 25, 245);
-    SDL_Rect panel{260, 150, 440, 330};
+    SDL_Rect panel{260, 150, 440, 370};
     SDL_RenderFillRect(renderer, &panel);
 
     SDL_SetRenderDrawColor(renderer, 105, 119, 82, 255);
@@ -858,8 +1057,13 @@ void World::render(SDL_Renderer *renderer) const {
     drawText(renderer, "3 - Buy Health Potion (15 coins each)", 290, 325,
              {190, 199, 170, 255});
 
-    drawText(renderer, "H - Use a potion", 290, 360, {190, 199, 170, 255});
-    drawText(renderer, "E - Leave shop", 290, 405, {160, 174, 142, 255});
+    drawText(renderer,
+             hasRocketLauncher ? "4 - Chaos Launcher (OWNED) "
+                               : "4 - Buy Cahos Launcher (75 coinss)",
+             290, 350, {255, 150, 65, 255});
+
+    drawText(renderer, "H - Use a potion", 290, 390, {190, 199, 170, 255});
+    drawText(renderer, "E - Leave shop", 290, 430, {160, 174, 142, 255});
   }
 
   SDL_RenderPresent(renderer);

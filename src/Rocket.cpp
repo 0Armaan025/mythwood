@@ -133,8 +133,16 @@ void Rocket::beginExplosion() {
 
   exploding = true;
   explosionTimer = EXPLOSION_DURATION;
-  velocityX = 0.0f;
-  velocityY = 0.0f;
+  blastPending = true;
+}
+
+bool Rocket::consumeBlast() {
+  if (!blastPending) {
+    return false;
+  }
+
+  blastPending = false;
+  return true;
 }
 
 void Rocket::destroy() { alive = false; }

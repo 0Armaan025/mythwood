@@ -16,6 +16,7 @@ public:
   bool isExploding() const;
 
   void beginExplosion();
+  bool consumeBlast();
   void destroy();
   SDL_Rect getBounds() const;
 
@@ -39,6 +40,7 @@ private:
 
   bool alive = true;
   bool exploding = false;
+  bool blastPending = false;
 
   static constexpr float SPEED = 560.0f;
   static constexpr float MAX_FLIGHT_TIME = 2.0f;

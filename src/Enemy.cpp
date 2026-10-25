@@ -11,6 +11,13 @@ void Enemy::update(float deltaTime, const SDL_Rect &playerBounds) {
 
   hitFlashTimer = std::max(0.0f, hitFlashTimer - deltaTime);
 
+  x += knockbackVX * deltaTime;
+  y += knockbackVY * deltaTime;
+
+  const float damping = std::max(0.0f, 1.0f - 5.0f * deltaTime);
+  knockbackVX *= damping;
+  knockbackVY *= damping;
+
   const SDL_Rect enemyBounds = getBounds();
 
   const float enemyCenterX = enemyBounds.x + enemyBounds.w / 2.0f;
@@ -113,3 +120,31 @@ SDL_Rect Enemy::getBounds() const {
 bool Enemy::isAlive() const { return alive; }
 
 int Enemy::getHealth() const { return health; }
+
+void Enemy::applyKnockback(float originX, float originY, float force) {
+
+  // oh wait yeah there's also this inv not showing bug, i gotta fix, again that
+  // must be the order thingy UHHAHAHAHAH
+
+  if (!alive || force <= 0.0f) {
+    return;
+  }
+
+  const SDL_Rect bounds = getBounds();
+
+  const float centerX = bounds.x + bounds.w / 2.0f;
+  const float centerY = bounds.y + bounds.h / 2.0f;
+
+  const float dx = centerX - originX;
+  const float dy = centerY - originY;
+
+  const float distance = std::sqrt(dx * dx + dy * dy);
+
+  if (distance < 0.001f) {
+    knockbackVX += force;
+    return;
+  }
+
+  knockbackVX += (dx / distance) * force;
+  knockbackVY += (dy / distance) * force;
+}

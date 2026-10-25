@@ -10,8 +10,10 @@
 #include "../include/Enemy.h"
 #include "../include/Inventory.h"
 #include "../include/Projectile.h"
+#include "../include/Rocket.h"
 #include "../include/Structure.h"
 #include <cstdint>
+
 #include <unordered_set>
 
 struct ResourceNode {
@@ -75,6 +77,7 @@ private:
                 SDL_Color color) const;
 
   std::vector<Projectile> projectiles;
+  std::vector<Rocket> rockets;
 
   bool previousP = false;
   bool magicEquipped = false;
@@ -108,4 +111,18 @@ private:
 
   static constexpr int POTION_PRICE = 15;
   static constexpr int POTION_HEAL_AMOUNT = 30;
+
+  bool hasRocketLauncher = false;
+  bool launcherEquipped = false;
+
+  int rocketAmmo = 0;
+
+  bool previousBuyLauncher = false;
+  bool previousLauncherToggle = false;
+
+  float rocketCooldown = 0.0f;
+
+  static constexpr int ROCKET_LAUNCHER_PRICE = 75;
+  static constexpr int STARTING_ROCKET_AMMO = 8;
+  static constexpr float ROCKET_FIRE_INTERVAL = 0.65f;
 };
