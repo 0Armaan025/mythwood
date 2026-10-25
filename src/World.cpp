@@ -696,10 +696,10 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     launcherEquipped = false;
     message = "Out of rockets! Launcher holstered.";
   } else {
-    const SDL_Rect playerBounds = player.getBounds();
+    const SDL_Rect launchBounds = player.getBounds();
 
-    const float startX = playerBounds.x + playerBounds.w / 2.0f;
-    const float startY = playerBounds.y + playerBounds.h / 2.0f;
+    const float startX = launchBounds.x + launchBounds.w / 2.0f;
+    const float startY = launchBounds.y + launchBounds.h / 2.0f;
 
     rockets.emplace_back(startX, startY, static_cast<float>(mouseX) + cameraX,
                          static_cast<float>(mouseY) + cameraY);
@@ -708,8 +708,10 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
     rocketCooldown = ROCKET_FIRE_INTERVAL;
   }
 
-  cameraX = playerBounds.x + playerBounds.w / 2.0f - 960.0f / 2.0f;
-  cameraY = playerBounds.y + playerBounds.h / 2.0f - 640.0f / 2.0f;
+  const SDL_Rect playerBoundsNew = player.getBounds();
+
+  cameraX = playerBoundsNew.x + playerBoundsNew.w / 2.0f - 960.0f / 2.0f;
+  cameraY = playerBoundsNew.y + playerBoundsNew.h / 2.0f - 640.0f / 2.0f;
 }
 
 void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
@@ -1148,7 +1150,7 @@ bool World::loadGame() {
   int loadedCoins = 0;
 
   if (version >= 2) {
-    if (!(in >> loadedCoins || loadedCoins < 0)) {
+    if (!(in >> loadedCoins) || loadedCoins < 0) {
       return false;
     }
   }
