@@ -6,7 +6,7 @@
 // harmless slime :)
 class Enemy {
 public:
-  Enemy(float x, float y);
+  Enemy(float x, float y, SDL_Color color = SDL_Color{85, 205, 110, 255});
 
   void update(float deltaTime, const SDL_Rect &playerBounds);
   void render(SDL_Renderer *renderer, float cameraX = 0.0f,
@@ -36,4 +36,6 @@ private:
 
   float knockbackVX = 0.0f;
   float knockbackVY = 0.0f;
+
+  SDL_Color color;
 };

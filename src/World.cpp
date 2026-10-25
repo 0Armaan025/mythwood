@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <random>
 
 #include <fstream>
 #include <iomanip>
@@ -66,17 +67,6 @@ bool World::init() {
 void World::start() {
   enemies.clear();
 
-  const SDL_Point slimeSpawns[] = {
-      {500, 420}, {250, 350}, {350, 500}, {420, 150}, {560, 280},
-      {600, 520}, {720, 350}, {800, 450}, {900, 250}, {950, 600},
-      {150, 400}, {200, 550}, {700, 650}, {1000, 400}};
-
-  for (const SDL_Point &spawn : slimeSpawns) {
-
-    enemies.emplace_back(static_cast<float>(spawn.x),
-                         static_cast<float>(spawn.y));
-  }
-
   player.reset();
   projectiles.clear();
   magicEquipped = false;
@@ -116,6 +106,75 @@ void World::start() {
   playerDamageCoolDown = 0.0f;
   playerDead = false;
   respawnTimer = 0.0f;
+
+  static std::mt19937 rng(std::random_device{}());
+
+  std::uniform_int_distribution<int> xDist(80, 2000);
+  std::uniform_int_distribution<int> yDist(80, 1600);
+  std::uniform_int_distribution<int> colorDist(0, 5);
+
+  const SDL_Color slimeColors[] = {{85, 205, 110, 255},  {80, 200, 230, 255},
+                                   {170, 105, 235, 255}, {245, 115, 165, 255},
+                                   {245, 165, 65, 255},  {100, 135, 255, 255}};
+
+  const SDL_Rect safeStructures[] = {{390, 270, 34, 28},
+                                     {650, 180, 48, 52},
+                                     {140, 160, 100, 80},
+                                     {300, 160, 54, 58}};
+
+  constexpr int SLIME_COUNT = 15;
+
+  for (int i = 0; i < SLIME_COUNT; ++i) {
+    bool placed = false;
+    for (int attempt = 0; attempt < 100 && !placed; ++attempt) {
+      const int x = xDist(rng);
+      const int y = yDist(rng);
+
+      const SDL_Rect candidate{x, y, 28, 24};
+      const SDL_Rect playerBounds = player.getBounds();
+      // wont' spawn near player
+      const float dx = static_cast<float>(x - playerBounds.x);
+      const float dy = static_cast<float>(y - playerBounds.y);
+
+      if (dx * dx + dy * dy < 220.0f * 220.0f) {
+        continue;
+      }
+
+      bool blocked = false;
+
+      for (const SDL_Rect &structure : safeStructures) {
+        if (SDL_HasIntersection(&candidate, &structure)) {
+          blocked = true;
+          break;
+        }
+      }
+
+      // no stacking
+
+      for (const auto &enemy : enemies) {
+        SDL_Rect existing = enemy.getBounds();
+
+        SDL_Rect expanded{existing.x - 36, existing.y - 36, existing.w + 72,
+                          existing.h + 72};
+
+        if (SDL_HasIntersection(&candidate, &expanded)) {
+          blocked = true;
+          break;
+        }
+      }
+
+      if (blocked) {
+        continue;
+      }
+
+      // colors
+      const SDL_Color color = slimeColors[colorDist(rng)];
+
+      enemies.emplace_back(static_cast<float>(x), static_cast<float>(y), color);
+
+      placed = true;
+    }
+  }
 
   structures.emplace_back(StructureType::Chest, SDL_Rect{390, 270, 34, 28},
                           "Old Chest");

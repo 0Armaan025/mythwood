@@ -3,7 +3,8 @@
 
 #include <algorithm>
 
-Enemy::Enemy(float startX, float startY) : x(startX), y(startY) {}
+Enemy::Enemy(float startX, float startY, SDL_Color slimeColor)
+    : x(startX), y(startY), color(slimeColor) {}
 
 void Enemy::update(float deltaTime, const SDL_Rect &playerBounds) {
   if (!alive)
@@ -57,7 +58,7 @@ void Enemy::render(SDL_Renderer *renderer, float cameraX, float cameraY) const {
     SDL_SetRenderDrawColor(renderer, 255, 245, 245, 255);
 
   else {
-    SDL_SetRenderDrawColor(renderer, 85, 205, 110, 255);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
   }
 
   SDL_Rect slimeBody = {screenBody.x + 2, screenBody.y + 8, screenBody.w - 4,
