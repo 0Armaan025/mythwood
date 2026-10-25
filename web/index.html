@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Mythwood</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #18231e;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: none;
+  }
+  canvas {
+    display: block;
+    max-width: 100vw;
+    max-height: 100vh;
+    background: #18231e;
+  }
+  #status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #dcc49e;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 14px;
+    text-align: center;
+    display: none;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas" width="960" height="640"></canvas>
+<div id="status">Loading Mythwood&hellip;</div>
+
+<script>
+var Module = {
+  canvas: document.getElementById('canvas'),
+
+  onAbort: function (what) {
+    var el = document.getElementById('status');
+    if (el) {
+      el.style.display = 'block';
+      el.textContent = 'Abort: ' + what;
+    }
+    console.error('emscripten abort:', what);
+  },
+
+  printErr: function (text) {
+    console.error(text);
+  }
+};
+</script>
+
+<script src="mythwood.js"></script>
+</body>
+</html>
