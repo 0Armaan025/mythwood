@@ -38,12 +38,23 @@ std::uint64_t resourcekey(int x, int y) {
 World::~World() {
   if (font)
     TTF_CloseFont(font);
+
+  if (endingFont) {
+
+    TTF_CloseFont(endingFont);
+  }
+  if (subtitleFont) {
+    TTF_CloseFont(subtitleFont);
+  }
 }
 
 bool World::init() {
   font = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSerif.ttf", 18);
 
-  if (!font) {
+  endingFont = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSerif.ttf", 64);
+  subtitleFont = TTF_OpenFont("/usr/share/fonts/TTF/DejaVuSerif.ttf", 22);
+
+  if (!font || !endingFont || !subtitleFont) {
     cout << "error: " << TTF_GetError() << endl;
     return false;
   }
@@ -127,6 +138,33 @@ void World::start() {
 
 void World::update(float deltaTime, SDL_Renderer *renderer) {
   const Uint8 *keys = SDL_GetKeyboardState(nullptr);
+
+  if (launcherEnding) {
+    endingTimer += deltaTime;
+    int mouseX = 0;
+    int mouseY = 0;
+
+    const Uint32 mouseButtons = SDL_GetMouseState(&mouseX, &mouseY);
+
+    const SDL_Point mousePoint{mouseX, mouseY};
+
+    restartHovered = SDL_PointInRect(&mousePoint, &restartButton) == SDL_TRUE;
+
+    const bool mouseDown = (mouseButtons & SDL_BUTTON_LMASK) != 0;
+
+    if (mouseDown && !restartMouseWasDown && restartHovered) {
+      launcherEnding = false;
+      endingTimer = 0.0f;
+      restartHovered = false;
+      restartMouseWasDown = false;
+
+      start();
+      return;
+    }
+
+    restartMouseWasDown = mouseDown;
+    return;
+  }
 
   if (keys[SDL_SCANCODE_ESCAPE]) {
     if (!saveGame()) {
@@ -689,23 +727,28 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   const SDL_Rect playerBounds = player.getBounds();
 
   if (!inventoryOpen && !shopOpen && launcherEquipped &&
+
       (mouseButtons & SDL_BUTTON_LMASK) && rocketCooldown <= 0.0f) {
-  }
+    if (rocketAmmo <= 0) {
+      launcherEquipped = false;
+      message = "Out of rockets! Launcher holstered.";
+    } else {
+      const SDL_Rect launchBounds = player.getBounds();
 
-  if (rocketAmmo <= 0) {
-    launcherEquipped = false;
-    message = "Out of rockets! Launcher holstered.";
-  } else {
-    const SDL_Rect launchBounds = player.getBounds();
+      const float startX = launchBounds.x + launchBounds.w / 2.0f;
+      const float startY = launchBounds.y + launchBounds.h / 2.0f;
 
-    const float startX = launchBounds.x + launchBounds.w / 2.0f;
-    const float startY = launchBounds.y + launchBounds.h / 2.0f;
+      rockets.emplace_back(startX, startY, static_cast<float>(mouseX) + cameraX,
+                           static_cast<float>(mouseY) + cameraY);
 
-    rockets.emplace_back(startX, startY, static_cast<float>(mouseX) + cameraX,
-                         static_cast<float>(mouseY) + cameraY);
+      --rocketAmmo;
+      rocketCooldown = ROCKET_FIRE_INTERVAL;
 
-    --rocketAmmo;
-    rocketCooldown = ROCKET_FIRE_INTERVAL;
+      if (rocketAmmo == 0) {
+        launcherEnding = true;
+        endingTimer = 0.0f;
+      }
+    }
   }
 
   const SDL_Rect playerBoundsNew = player.getBounds();
@@ -740,6 +783,105 @@ void World::drawText(SDL_Renderer *renderer, const string &text, int x, int y,
 }
 
 void World::render(SDL_Renderer *renderer) const {
+
+  if (launcherEnding) {
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
+
+    const float progress = std::min(1.0f, endingTimer / 1.5f);
+    const float eased = 1.0f - (1.0f - progress) * (1.0f - progress);
+
+    const Uint8 alpha = static_cast<Uint8>(255.0f * eased);
+
+    const std::string title = "Well Played";
+
+    SDL_Surface *surface = TTF_RenderUTF8_Blended(endingFont, title.c_str(),
+                                                  SDL_Color{25, 35, 30, alpha});
+
+    if (surface) {
+      SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+      if (texture) {
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+        SDL_SetTextureAlphaMod(texture, alpha);
+
+        const float scale = 0.85f + 0.15f * eased;
+        const int width = static_cast<int>(surface->w * scale);
+        const int height = static_cast<int>(surface->h * scale);
+
+        SDL_Rect destination{(960 - width) / 2, (640 - height) / 2 - 20, width,
+                             height};
+
+        SDL_RenderCopy(renderer, texture, nullptr, &destination);
+        SDL_DestroyTexture(texture);
+      }
+
+      SDL_FreeSurface(surface);
+    }
+
+    if (endingTimer > 1.0f) {
+      const std::string subtitle = "You have unleashed chaos...";
+
+      SDL_Surface *subSurface = TTF_RenderUTF8_Blended(
+          subtitleFont, subtitle.c_str(), SDL_Color{100, 110, 105, 255});
+
+      if (subSurface) {
+        SDL_Texture *subTexture =
+            SDL_CreateTextureFromSurface(renderer, subSurface);
+
+        if (subSurface) {
+          SDL_Rect destination{(960 - subSurface->w) / 2, 390, subSurface->w,
+                               subSurface->h};
+
+          SDL_RenderCopy(renderer, subTexture, nullptr, &destination);
+          SDL_DestroyTexture(subTexture);
+        }
+
+        SDL_FreeSurface(subSurface);
+      }
+    }
+
+    if (restartHovered) {
+      SDL_SetRenderDrawColor(renderer, 45, 65, 53, 255);
+    } else {
+      SDL_SetRenderDrawColor(renderer, 35, 55, 43, 255);
+    }
+
+    SDL_RenderFillRect(renderer, &restartButton);
+
+    // border
+
+    SDL_SetRenderDrawColor(renderer, 170, 180, 172, 255);
+    SDL_RenderDrawRect(renderer, &restartButton);
+
+    const std::string restartText = "Restart";
+
+    SDL_Surface *buttonSurface = TTF_RenderUTF8_Blended(
+        subtitleFont, restartText.c_str(), SDL_Color{255, 255, 255, 255});
+
+    if (buttonSurface) {
+      SDL_Texture *buttonTexture =
+          SDL_CreateTextureFromSurface(renderer, buttonSurface);
+
+      if (buttonTexture) {
+        SDL_Rect textRect{
+            restartButton.x + (restartButton.w - buttonSurface->w) / 2,
+            restartButton.y + (restartButton.h - buttonSurface->h) / 2,
+            buttonSurface->w,
+            buttonSurface->h,
+        };
+
+        SDL_RenderCopy(renderer, buttonTexture, nullptr, &textRect);
+        SDL_DestroyTexture(buttonTexture);
+      }
+      // alright
+      // now time for random slime stuff yaey
+    }
+
+    SDL_RenderPresent(renderer);
+
+    return;
+  }
 
   SDL_SetRenderDrawColor(renderer, 35, 55, 39, 255);
   SDL_RenderClear(renderer);

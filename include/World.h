@@ -53,6 +53,8 @@ private:
   static constexpr float RESPAWN_DELAY = 1.5f;
 
   TTF_Font *font = nullptr;
+  TTF_Font *endingFont = nullptr;
+  TTF_Font *subtitleFont = nullptr;
   std::vector<Enemy> enemies;
 
   bool returnToMenu = false;
@@ -125,4 +127,11 @@ private:
   static constexpr int ROCKET_LAUNCHER_PRICE = 5;
   static constexpr int STARTING_ROCKET_AMMO = 8;
   static constexpr float ROCKET_FIRE_INTERVAL = 0.65f;
+  bool launcherEnding = false;
+
+  float endingTimer = 0.0f;
+
+  SDL_Rect restartButton{360, 430, 240, 64};
+  bool restartHovered = false;
+  bool restartMouseWasDown = false;
 };
