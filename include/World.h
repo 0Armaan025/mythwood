@@ -102,4 +102,10 @@ private:
 
   static constexpr int WOOD_SELL_PRICE = 3;
   static constexpr int STONE_SELL_PRICE = 2;
+
+  bool previousBuyPotion = false;
+  bool previousUsePotion = false;
+
+  static constexpr int POTION_PRICE = 15;
+  static constexpr int POTION_HEAL_AMOUNT = 30;
 };

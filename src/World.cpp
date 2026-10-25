@@ -53,6 +53,7 @@ bool World::init() {
 
 void World::start() {
   enemies.clear();
+
   enemies.emplace_back(500.0f, 420.0f);
   player.reset();
   projectiles.clear();
@@ -61,6 +62,9 @@ void World::start() {
   shotCoolDown = 0.0f;
   inventory = Inventory{};
   structures.clear();
+
+  previousBuyPotion = false;
+  previousUsePotion = false;
 
   coins = 0;
   shopOpen = false;
@@ -120,6 +124,9 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
 
   const bool sellWoodDown = keys[SDL_SCANCODE_1];
   const bool sellStoneDown = keys[SDL_SCANCODE_2];
+  const bool buyPotionDown = keys[SDL_SCANCODE_3];
+
+  const bool usePotionDown = keys[SDL_SCANCODE_H];
 
   if (shopOpen) {
     if (eDown && !previousE) {
@@ -149,6 +156,39 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
 
       } else {
         message = "You don't have any stone to sell.";
+      }
+    }
+
+    if (!shopOpen && usePotionDown && !previousUsePotion) {
+      if (playerHealth >= MAX_PLAYER_HEALTH) {
+        message = "Your health is already full.";
+
+      } else if (inventory.removeItem("health_potion", 1)) {
+        playerHealth =
+            std::min(MAX_PLAYER_HEALTH, playerHealth + POTION_HEAL_AMOUNT);
+
+        message = "Health restored!";
+      } else {
+        message = "You don't have a Health Potion.";
+      }
+    }
+
+    previousBuyPotion = buyPotionDown;
+    previousUsePotion = usePotionDown;
+
+    if (buyPotionDown && !previousBuyPotion) {
+      if (coins < POTION_PRICE) {
+        message = "Not enough coins! you need 15.";
+
+      }
+
+      else if (inventory.addItem(
+                   Item{"health_potion", "Health Potion", 1, 99})) {
+        coins = coins - POTION_PRICE;
+
+        message = "Bought a Health Potion1!";
+      } else {
+        message = "Inventory full!";
       }
     }
   }
@@ -329,7 +369,7 @@ void World::update(float deltaTime, SDL_Renderer *renderer) {
   previousE = eDown;
   previousI = iDown;
 
-  if (!inventoryOpen) {
+  if (!inventoryOpen && !shopOpen) {
     std::vector<SDL_Rect> obstacles;
     obstacles.reserve(structures.size() + resourceNodes.size());
 
@@ -796,7 +836,11 @@ void World::render(SDL_Renderer *renderer) const {
       drawText(renderer, "2 - Sell all stone (2 coins each)", 290, 305,
                {190, 199, 170, 255});
 
-      drawText(renderer, "E - Leave shop", 290, 380, {160, 174, 142, 255});
+      drawText(renderer, "3 - Buy Health Potion (15 coins each)", 290, 325,
+               {190, 199, 170, 255});
+
+      drawText(renderer, "H - Use a potion", 290, 360, {190, 199, 170, 255});
+      drawText(renderer, "E - Leave shop", 290, 405, {160, 174, 142, 255});
     }
 
     if (inventory.getItems().empty())
@@ -819,10 +863,12 @@ bool World::saveGame() const {
   if (!out)
     return false;
 
-  out << "MYTHWOOD_SAVE 1\n";
+  out << "MYTHWOOD_SAVE 2\n";
   out << std::setprecision(std::numeric_limits<float>::max_digits10);
 
   out << player.getX() << ' ' << player.getY() << '\n';
+
+  out << coins << '\n';
 
   const auto &items = inventory.getItems();
   out << items.size() << '\n';
@@ -864,12 +910,21 @@ bool World::loadGame() {
   std::string magic;
   int version = 0;
 
-  if (!(in >> magic >> version) || magic != "MYTHWOOD_SAVE" || version != 1) {
+  if (!(in >> magic >> version) || magic != "MYTHWOOD_SAVE" ||
+      (version != 1 && version != 2)) {
     return false;
   }
 
   float loadedX = 0.0f;
   float loadedY = 0.0f;
+
+  int loadedCoins = 0;
+
+  if (version >= 2) {
+    if (!(in >> loadedCoins || loadedCoins < 0)) {
+      return false;
+    }
+  }
 
   if (!(in >> loadedX >> loadedY) || !std::isfinite(loadedX) ||
       !std::isfinite(loadedY)) {
@@ -908,7 +963,9 @@ bool World::loadGame() {
   }
 
   std::size_t structureCount = 0;
-  if (!(in >> structureCount) || structureCount != 3)
+
+  const std::size_t expectedStructureCount = version == 1 ? 3 : 4;
+  if (!(in >> structureCount) || structureCount != expectedStructureCount)
     return false;
 
   std::vector<bool> loadedStructureStates;
@@ -949,9 +1006,11 @@ bool World::loadGame() {
 
   start();
 
+  coins = loadedCoins;
+
   player.setPosition(loadedX, loadedY);
   inventory.setItems(loadedItems);
-  for (std::size_t i = 0; i < structures.size(); ++i) {
+  for (std::size_t i = 0; i < loadedStructureStates.size(); ++i) {
     structures[i].setUsed(loadedStructureStates[i]);
   }
 
